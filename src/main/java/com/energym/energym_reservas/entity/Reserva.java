@@ -19,21 +19,16 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "socio_id", nullable = false)
     private Socio socio;
 
-    // Relación con Clase (muchas reservas pertenecen a una clase)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clase_id", nullable = false)
     private Clase clase;
 
     @Column(nullable = false)
     private LocalDateTime fechaReserva;
-
-    @Column(nullable = false)
-    private LocalDateTime fechaClase;
 
     @Column(name = "estado", nullable = false)
     private String estado; // CONFIRMADA, CANCELADA, COMPLETADA

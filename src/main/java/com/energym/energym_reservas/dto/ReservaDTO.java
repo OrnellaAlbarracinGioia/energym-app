@@ -24,13 +24,8 @@ public class ReservaDTO {
     @NotNull(message = "El ID de la clase es obligatorio")
     private Integer claseId;
     
-    private String claseNombre; // Para mostrar en respuestas
-    
     private LocalDateTime fechaReserva;
-    
-    @NotNull(message = "La fecha de la clase es obligatoria")
-    private LocalDateTime fechaClase;
-    
+
     @NotNull(message = "El estado es obligatorio")
     private String estado; // CONFIRMADA, CANCELADA, COMPLETADA
     

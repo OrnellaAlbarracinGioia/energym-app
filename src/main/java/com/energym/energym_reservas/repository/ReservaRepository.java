@@ -12,7 +12,7 @@ import java.util.List;
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
     /**
-     * Contar reservas CONFIRMADAS para una clase específica
+     * Contar reservas CONFIRMADAS para una actividad específica
      * Esto determina si hay cupos disponibles
      */
     @Query("SELECT COUNT(reserva) FROM Reserva reserva WHERE reserva.clase.id = :claseId AND reserva.estado = 'CONFIRMADA'")

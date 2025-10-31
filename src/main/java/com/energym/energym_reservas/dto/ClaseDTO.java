@@ -1,6 +1,12 @@
 package com.energym.energym_reservas.dto;
 
-import jakarta.validation.constraints.Min;
+import com.energym.energym_reservas.entity.Actividad;
+import com.energym.energym_reservas.entity.Entrenador;
+import com.energym.energym_reservas.entity.Sucursal;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,6 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -19,32 +26,18 @@ public class ClaseDTO {
 
     private Integer id;
 
-    @NotBlank(message = "El nombre de la clase es obligatorio")
-    private String nombre;
-
-    @NotNull(message = "La capacidad máxima es obligatoria")
-    @Min(value = 1, message = "La capacidad debe ser al menos 1")
-    private Integer capacidadMaxima;
+    @NotNull(message = "El ID de la actividad es obligatorio")
+    private Actividad actividad;
 
     private DayOfWeek dia;
 
-    @NotNull(message = "El horario es obligatorio")
     private LocalTime horario;
 
-    private String descripcion;
+    private LocalDateTime fecha;
 
-    @NotNull(message = "La duración es obligatoria")
-    private Integer duracionMinutos;
+    @NotNull(message = "El ID de la actividad es obligatorio")
+    private Entrenador entrenador;
 
-    @NotNull(message = "El ID del entrenador es obligatorio")
-    private Integer entrenadorId;
-
-    private String entrenadorNombre; // Para mostrar en respuestas
-
-    @NotNull(message = "El ID de la sucursal es obligatorio")
-    private Integer sucursalId;
-
-    private String sucursalNombre; // Para mostrar en respuestas
-
-    private Integer cuposDisponibles; // Calculado
+    @NotNull(message = "El ID de la actividad es obligatorio")
+    private Sucursal sucursal;
 }

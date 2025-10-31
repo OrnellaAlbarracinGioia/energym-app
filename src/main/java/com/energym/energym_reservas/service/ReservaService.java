@@ -38,19 +38,9 @@ public class ReservaService {
 
         Integer reservasConfirmadas = reservaRepository.countReservasConfirmadasByClaseId(clase.getId());
 
-        if(reservasConfirmadas >= clase.getCapacidadMaxima()){
-            throw new IllegalStateException("La clase está llena. No se cuenta con cupos disponibles");
-        }
-
-        // Validar capacidad disponible
-        if (clase.getCuposDisponibles() <= 0) {
-            throw new RuntimeException("No hay cupos disponibles para esta clase");
-        }
-
         Reserva reserva = Reserva.builder()
                 .socio(socio)
                 .clase(clase)
-                .fechaClase(reservaDTO.getFechaClase())
                 .estado("CONFIRMADA")
                 .build();
 
@@ -103,10 +93,6 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con id: " + id));
 
-        if (reservaDTO.getFechaClase() != null) {
-            reserva.setFechaClase(reservaDTO.getFechaClase());
-        }
-
         if (reservaDTO.getEstado() != null) {
             reserva.setEstado(reservaDTO.getEstado());
         }
@@ -146,9 +132,7 @@ public class ReservaService {
                 .socioId(reserva.getSocio().getId())
                 .socioNombre(reserva.getSocio().getNombre())
                 .claseId(reserva.getClase().getId())
-                .claseNombre(reserva.getClase().getNombre())
                 .fechaReserva(reserva.getFechaReserva())
-                .fechaClase(reserva.getFechaClase())
                 .estado(reserva.getEstado())
                 .fechaCancelacion(reserva.getFechaCancelacion())
                 .build();

@@ -35,5 +35,5 @@ public class SocioDTO {
     
     // Para mostrar información adicional en respuestas
     private Integer totalReservas;
-    private Boolean calificaParaSesionGratuita; // Si tiene 10+ clases personalizadas
+    private Boolean calificaParaSesionGratuita; // Si tiene 10+ actividades personalizadas
 }

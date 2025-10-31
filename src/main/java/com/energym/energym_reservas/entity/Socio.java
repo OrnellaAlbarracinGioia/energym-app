@@ -40,7 +40,7 @@ public class Socio {
 
     private Boolean activo = true;
 
-    /*Esta forma permite que se detecten no solo el beneficio de 10 clases completas en un mes,
+    /*Esta forma permite que se detecten no solo el beneficio de 10 actividades completas en un mes,
     sino que puede contemplar otro tipo de factores utilizando la misma lógica
     * */
     private Integer clasesPersonalizadas;
