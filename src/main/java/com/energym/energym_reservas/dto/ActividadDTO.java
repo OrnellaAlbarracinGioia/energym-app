@@ -22,10 +22,6 @@ public class ActividadDTO {
     @NotBlank(message = "El nombre de la actividad es obligatorio")
     private String nombre;
 
-    @NotNull(message = "La capacidad máxima es obligatoria")
-    @Min(value = 1, message = "La capacidad debe ser al menos 1")
-    private Integer capacidadMaxima;
-
     private String descripcion;
 
     @NotNull(message = "La duración es obligatoria")

@@ -1,6 +1,7 @@
 package com.energym.energym_reservas.service;
 
 import com.energym.energym_reservas.dto.SocioDTO;
+import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Socio;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.repository.SocioRepository;
@@ -126,8 +127,8 @@ public class SocioService {
      * Convertir entidad a DTO
      */
     private SocioDTO convertToDTO(Socio socio) {
-        // Obtener número de reservas activas
-        Long totalReservas = socioRepository.countReservasActivasBySocioId(socio.getId());
+        // Obtener número de reservas activa
+        Integer totalReservas = socioRepository.countReservasActivasBySocioId(socio.getId(), Estado.CONFIRMADA);
 
         return SocioDTO.builder()
                 .id(socio.getId())
@@ -137,7 +138,7 @@ public class SocioService {
                 .fechaRegistro(socio.getFechaRegistro())
                 .activo(socio.getActivo())
                 .clasesPersonalizadas(socio.getClasesPersonalizadas())
-                .totalReservas(totalReservas != null ? totalReservas.intValue() : 0)
+                .totalReservas(totalReservas != null ? totalReservas : 0)
                 .calificaParaSesionGratuita(socio.getClasesPersonalizadas() >= 10)
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.energym.energym_reservas.dto;
 
+import com.energym.energym_reservas.entity.Estado;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,13 +25,12 @@ public class ReservaDTO {
     @NotNull(message = "El ID de la clase es obligatorio")
     private Integer claseId;
     
-    private LocalDateTime fechaReserva;
+    private LocalDateTime fecha;
 
     @NotNull(message = "El estado es obligatorio")
     private String estado; // CONFIRMADA, CANCELADA, COMPLETADA
     
     private LocalDateTime fechaCancelacion;
 
-    // Información adicional para respuestas
-    private Integer cuposDisponibles;
+
 }

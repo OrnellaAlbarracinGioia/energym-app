@@ -1,5 +1,6 @@
 package com.energym.energym_reservas.repository;
 
+import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Socio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +27,7 @@ public interface SocioRepository extends JpaRepository<Socio, Integer> {
     /**
      * Contar reservas activas de un socio
      */
-    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.socio.id = :socioId AND r.estado = 'CONFIRMADA'")
-    Long countReservasActivasBySocioId(@Param("socioId") Integer socioId);
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.socio.id = :socioId AND r.estado = :estado")
+    Integer countReservasActivasBySocioId(@Param("socioId") Integer socioId, @Param("estado") Estado estado);
+
 }

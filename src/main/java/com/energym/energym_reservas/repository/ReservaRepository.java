@@ -1,5 +1,6 @@
 package com.energym.energym_reservas.repository;
 
+import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Reserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,12 +16,17 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
      * Contar reservas CONFIRMADAS para una actividad específica
      * Esto determina si hay cupos disponibles
      */
-    @Query("SELECT COUNT(reserva) FROM Reserva reserva WHERE reserva.clase.id = :claseId AND reserva.estado = 'CONFIRMADA'")
-    Integer countReservasConfirmadasByClaseId(@Param("claseId") Integer claseId);
+
+    Integer countByClaseIdAndEstado(Integer claseId, Estado estado);
 
     List<Reserva> findBySocioId(Integer socioId);
     
     List<Reserva> findByClaseId(Integer claseId);
     
-    List<Reserva> findByEstado(String estado);
+    List<Reserva> findByEstado(Estado estado);
+
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.socio.id = :socioId AND r.clase.id = :claseId")
+    boolean existsReservaActivaBySocioAndClase(@Param("socioId")Integer socioId, @Param("claseId")Integer claseId);
+
+    Reserva getReservaBySocioIdAndClaseId(Integer socioId, Integer claseId);
 }

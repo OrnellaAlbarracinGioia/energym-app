@@ -2,12 +2,15 @@ package com.energym.energym_reservas.service;
 
 import com.energym.energym_reservas.dto.ReservaDTO;
 import com.energym.energym_reservas.entity.Clase;
+import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Reserva;
 import com.energym.energym_reservas.entity.Socio;
+import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.repository.ClaseRepository;
 import com.energym.energym_reservas.repository.ReservaRepository;
 import com.energym.energym_reservas.repository.SocioRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,21 +35,38 @@ public class ReservaService {
         if(!socio.getActivo())
             throw new IllegalStateException("Socio no se encuentra activo");
 
-
         Clase clase = claseRepository.findById(reservaDTO.getClaseId())
                 .orElseThrow(() -> new RuntimeException("Clase no encontrada con id: " + reservaDTO.getClaseId()));
 
-        Integer reservasConfirmadas = reservaRepository.countReservasConfirmadasByClaseId(clase.getId());
+        Integer cuposDisponibles = verificarDisponibilidad(clase.getId(), Estado.CONFIRMADA);
+
+        if(cuposDisponibles <= 0){
+            throw new IllegalStateException("La clase '" + clase.getActividad().getNombre() + "' del " + clase.getFecha() +
+                    " a las " + clase.getHorario() + " está llena. ");
+        }
 
         Reserva reserva = Reserva.builder()
                 .socio(socio)
                 .clase(clase)
-                .estado("CONFIRMADA")
                 .build();
 
-        Reserva reservaGuardada = reservaRepository.save(reserva);
-        return convertirADTO(reservaGuardada);
+        return convertirADTO(reservaRepository.save(reserva));
     }
+
+
+    @Transactional(readOnly = true)
+    public Integer verificarDisponibilidad(Integer claseId, Estado estado) {
+        Clase clase = claseRepository.findById(claseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clase no encontrada"));
+
+        Integer reservasConfirmadas = reservaRepository
+                .countByClaseIdAndEstado(claseId, estado);
+
+        Integer capacidadMaxima = clase.getCapacidadMaxima();
+
+        return capacidadMaxima - reservasConfirmadas;
+    }
+
 
     // READ - Obtener todas las reservas
     @Transactional(readOnly = true)
@@ -83,7 +103,7 @@ public class ReservaService {
     // READ - Obtener reservas por estado
     @Transactional(readOnly = true)
     public List<ReservaDTO> obtenerReservasPorEstado(String estado) {
-        return reservaRepository.findByEstado(estado).stream()
+        return reservaRepository.findByEstado(Estado.valueOf(estado)).stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
@@ -94,7 +114,7 @@ public class ReservaService {
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con id: " + id));
 
         if (reservaDTO.getEstado() != null) {
-            reserva.setEstado(reservaDTO.getEstado());
+            reserva.setEstado(Estado.valueOf(reservaDTO.getEstado().toUpperCase()));
         }
 
         Reserva reservaActualizada = reservaRepository.save(reserva);
@@ -106,11 +126,11 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con id: " + id));
 
-        if (!"CONFIRMADA".equals(reserva.getEstado())) {
+        if (!reserva.getEstado().equals(Estado.CONFIRMADA)) {
             throw new RuntimeException("Solo se pueden cancelar reservas confirmadas");
         }
 
-        reserva.setEstado("CANCELADA");
+        reserva.setEstado(Estado.CANCELADA);
         reserva.setFechaCancelacion(LocalDateTime.now());
 
         Reserva reservaActualizada = reservaRepository.save(reserva);
@@ -132,8 +152,8 @@ public class ReservaService {
                 .socioId(reserva.getSocio().getId())
                 .socioNombre(reserva.getSocio().getNombre())
                 .claseId(reserva.getClase().getId())
-                .fechaReserva(reserva.getFechaReserva())
-                .estado(reserva.getEstado())
+                .fecha(reserva.getFecha())
+                .estado(reserva.getEstado().toString())
                 .fechaCancelacion(reserva.getFechaCancelacion())
                 .build();
     }

@@ -24,11 +24,6 @@ public class Actividad {
     @Column(nullable = false)
     private String nombre;
 
-    @NotNull(message = "La capacidad maxima de la actividad es requerida")
-    @Min(value = 1, message = "La capacidad debe ser al menos 1")
-    @Column(nullable = false)
-    private Integer capacidadMaxima;
-
     private String descripcion;
 
     @NotNull(message = "La duración es obligatoria")

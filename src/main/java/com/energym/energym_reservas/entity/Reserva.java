@@ -28,18 +28,18 @@ public class Reserva {
     private Clase clase;
 
     @Column(nullable = false)
-    private LocalDateTime fechaReserva;
+    private LocalDateTime fecha;
 
     @Column(name = "estado", nullable = false)
-    private String estado; // CONFIRMADA, CANCELADA, COMPLETADA
+    private Estado estado; // CONFIRMADA, CANCELADA, COMPLETADA, PENDIENTE
 
     private LocalDateTime fechaCancelacion;
 
     @PrePersist
     protected void onCreate() {
-        fechaReserva = LocalDateTime.now();
+        fecha = LocalDateTime.now();
         if (estado == null) {
-            estado = "CONFIRMADA";
+            estado = Estado.CONFIRMADA;
         }
     }
 }

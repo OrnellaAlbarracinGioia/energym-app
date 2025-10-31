@@ -53,7 +53,6 @@ public class ActividadService {
         // Crear la entidad
         Actividad actividad = Actividad.builder()
                 .nombre(actividadDTO.getNombre())
-                .capacidadMaxima(actividadDTO.getCapacidadMaxima())
                 .descripcion(actividadDTO.getDescripcion())
                 .duracionMinutos(actividadDTO.getDuracionMinutos())
                 .build();
@@ -72,7 +71,6 @@ public class ActividadService {
 
         // Actualizar campos básicos
         actividad.setNombre(actividadDTO.getNombre());
-        actividad.setCapacidadMaxima(actividadDTO.getCapacidadMaxima());
 
         actividad.setDescripcion(actividadDTO.getDescripcion());
         actividad.setDuracionMinutos(actividadDTO.getDuracionMinutos());
@@ -100,7 +98,6 @@ public class ActividadService {
         return ActividadDTO.builder()
                 .id(actividad.getId())
                 .nombre(actividad.getNombre())
-                .capacidadMaxima(actividad.getCapacidadMaxima())
                 .descripcion(actividad.getDescripcion())
                 .duracionMinutos(actividad.getDuracionMinutos())
                 .build();
