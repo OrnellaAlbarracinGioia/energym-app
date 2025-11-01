@@ -30,6 +30,12 @@ public class SocioController {
         return ResponseEntity.ok(socios);
     }
 
+    @GetMapping("/{socioId}/clases-personalizadas")
+    public ResponseEntity<Integer> obtenerClasesPersonalizadas(@PathVariable Integer socioId) {
+        SocioDTO socio = socioService.getSocioById(socioId);
+        return ResponseEntity.ok(socio.getClasesPersonalizadas());
+    }
+
     /**
      * Obtener un socio por ID
      */
@@ -55,8 +61,7 @@ public class SocioController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar socio", description = "Actualiza los datos de un socio existente")
-    public ResponseEntity<SocioDTO> updateSocio(@PathVariable Integer id, 
-                                                 @Valid @RequestBody SocioDTO socioDTO) {
+    public ResponseEntity<SocioDTO> updateSocio(@PathVariable Integer id, @Valid @RequestBody SocioDTO socioDTO) {
         SocioDTO socioActualizado = socioService.updateSocio(id, socioDTO);
         return ResponseEntity.ok(socioActualizado);
     }

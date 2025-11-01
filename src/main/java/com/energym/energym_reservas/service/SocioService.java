@@ -1,7 +1,6 @@
 package com.energym.energym_reservas.service;
 
 import com.energym.energym_reservas.dto.SocioDTO;
-import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Socio;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.repository.SocioRepository;
@@ -15,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SocioService {
 
     private final SocioRepository socioRepository;
@@ -42,7 +42,6 @@ public class SocioService {
     /**
      * Crear un nuevo socio
      */
-    @Transactional
     public SocioDTO createSocio(SocioDTO socioDTO) {
         // Validar que el email no esté registrado
         if (socioRepository.existsByEmail(socioDTO.getEmail())) {
@@ -65,7 +64,6 @@ public class SocioService {
     /**
      * Actualizar un socio existente
      */
-    @Transactional
     public SocioDTO updateSocio(Integer id, SocioDTO socioDTO) {
         Socio socio = socioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
@@ -91,7 +89,6 @@ public class SocioService {
     /**
      * Eliminar un socio (soft delete - marcar como inactivo)
      */
-    @Transactional
     public void deleteSocio(Integer id) {
         Socio socio = socioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
@@ -104,7 +101,6 @@ public class SocioService {
     /**
      * Eliminar permanentemente un socio (hard delete)
      */
-    @Transactional
     public void deleteSocioPermanente(Integer id) {
         if (!socioRepository.existsById(id)) {
             throw new ResourceNotFoundException("Socio no encontrado con id: " + id);
@@ -123,12 +119,18 @@ public class SocioService {
                 .collect(Collectors.toList());
     }
 
+    public void beneficioClasePersonalizadaGratuita(Integer id) {
+        Socio socio = socioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
+
+        Integer clasesActualizadas = socio.getClasesPersonalizadas() + 1;
+        socio.setClasesPersonalizadas(clasesActualizadas);
+    }
+
     /**
      * Convertir entidad a DTO
      */
     private SocioDTO convertToDTO(Socio socio) {
-        // Obtener número de reservas activa
-        Integer totalReservas = socioRepository.countReservasActivasBySocioId(socio.getId(), Estado.CONFIRMADA);
 
         return SocioDTO.builder()
                 .id(socio.getId())
@@ -138,8 +140,6 @@ public class SocioService {
                 .fechaRegistro(socio.getFechaRegistro())
                 .activo(socio.getActivo())
                 .clasesPersonalizadas(socio.getClasesPersonalizadas())
-                .totalReservas(totalReservas != null ? totalReservas : 0)
-                .calificaParaSesionGratuita(socio.getClasesPersonalizadas() >= 10)
                 .build();
     }
 }

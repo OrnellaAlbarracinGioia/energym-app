@@ -26,14 +26,10 @@ public class SocioDTO {
     
     @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
-    
+
     private LocalDateTime fechaRegistro;
     
     private Boolean activo;
-    
+
     private Integer clasesPersonalizadas;
-    
-    // Para mostrar información adicional en respuestas
-    private Integer totalReservas;
-    private Boolean calificaParaSesionGratuita; // Si tiene 10+ actividades personalizadas
 }

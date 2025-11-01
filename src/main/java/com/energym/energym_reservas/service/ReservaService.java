@@ -5,6 +5,7 @@ import com.energym.energym_reservas.entity.Clase;
 import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Reserva;
 import com.energym.energym_reservas.entity.Socio;
+import com.energym.energym_reservas.event.ReservaCompletadaEvent;
 import com.energym.energym_reservas.exception.CapacidadLlenaException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.repository.ClaseRepository;
@@ -12,6 +13,7 @@ import com.energym.energym_reservas.repository.ReservaRepository;
 import com.energym.energym_reservas.repository.SocioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,8 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final SocioRepository socioRepository;
     private final ClaseRepository claseRepository;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     // CREATE valida
     public ReservaDTO crearReserva(ReservaDTO reservaDTO) throws CapacidadLlenaException {
@@ -156,7 +160,7 @@ public class ReservaService {
         log.info("Reserva {} eliminada", id);
     }
 
-    public ReservaDTO marcarAsistencia(Integer reservaId, Boolean asistio) {
+    public ReservaDTO marcarAsistencia(Integer reservaId) {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
 
@@ -164,14 +168,32 @@ public class ReservaService {
             throw new IllegalStateException("No se puede marcar asistencia antes de que la clase ocurra");
         }
 
-        if (asistio) {
-            reserva.setEstado(Estado.COMPLETADA);
-        }
+        reserva.setEstado(Estado.COMPLETADA);
+
+        ReservaCompletadaEvent event = new ReservaCompletadaEvent(this, reservaId);
+        applicationEventPublisher.publishEvent(event);
 
         reservaRepository.save(reserva);
         return convertirADTO(reserva);
     }
 
+    public Integer contarClasesCompletadasEnMes(Integer socioId) {
+        // Obtener primer y último día del mes actual
+        LocalDate hoy = LocalDate.now();
+        LocalDate inicioMes = hoy.withDayOfMonth(1);
+        LocalDate finMes = hoy.withDayOfMonth(hoy.lengthOfMonth());
+
+        // Contar las clases COMPLETADAS en ese rango
+        Integer clasesCompletadas = reservaRepository
+                .countBySocioIdAndEstadoAndClaseFechaBetween(
+                        socioId,
+                        Estado.COMPLETADA,
+                        inicioMes,
+                        finMes
+                );
+
+        return clasesCompletadas != null ? clasesCompletadas : 0;
+    }
 
     private Integer verificarDisponibilidad(Integer claseId) {
         Clase clase = claseRepository.findById(claseId)

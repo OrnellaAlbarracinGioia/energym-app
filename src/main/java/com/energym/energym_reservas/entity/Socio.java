@@ -38,7 +38,6 @@ public class Socio {
     @Column(nullable = false)
     private String telefono;
 
-
     private Boolean activo = true;
 
     /*Esta forma permite que se detecten no solo el beneficio de 10 actividades completas en un mes,

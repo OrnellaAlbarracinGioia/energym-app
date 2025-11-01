@@ -104,9 +104,8 @@ public class ReservaController {
 
     @PatchMapping("/{id}/marcar-asistencia")
     public ResponseEntity<ReservaDTO> marcarAsistencia(
-            @PathVariable Integer id,
-            @RequestParam Boolean asistio) {
-        ReservaDTO reserva = reservaService.marcarAsistencia(id, asistio);
+            @PathVariable Integer id) {
+        ReservaDTO reserva = reservaService.marcarAsistencia(id);
         return ResponseEntity.ok(reserva);
     }
 

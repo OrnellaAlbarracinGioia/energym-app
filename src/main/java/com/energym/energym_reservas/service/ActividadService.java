@@ -2,8 +2,6 @@ package com.energym.energym_reservas.service;
 
 import com.energym.energym_reservas.dto.ActividadDTO;
 import com.energym.energym_reservas.entity.Actividad;
-import com.energym.energym_reservas.entity.Entrenador;
-import com.energym.energym_reservas.entity.Sucursal;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.repository.ActividadRepository;
 import com.energym.energym_reservas.repository.EntrenadorRepository;
@@ -17,11 +15,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ActividadService {
 
     private final ActividadRepository actividadRepository;
-    private final EntrenadorRepository entrenadorRepository;
-    private final SucursalRepository sucursalRepository;
 
     /**
      * Obtener todas las actividades
@@ -47,7 +44,6 @@ public class ActividadService {
     /**
      * Crear una nueva actividad
      */
-    @Transactional
     public ActividadDTO createActividad(ActividadDTO actividadDTO) {
 
         // Crear la entidad
@@ -64,7 +60,6 @@ public class ActividadService {
     /**
      * Actualizar una actividad existente
      */
-    @Transactional
     public ActividadDTO updateActividad(Integer id, ActividadDTO actividadDTO) {
         Actividad actividad = actividadRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
@@ -83,7 +78,6 @@ public class ActividadService {
     /**
      * Eliminar una actividad
      */
-    @Transactional
     public void deleteActividad(Integer id) {
         if (!actividadRepository.existsById(id)) {
             throw new ResourceNotFoundException("Actividad no encontrada con id: " + id);

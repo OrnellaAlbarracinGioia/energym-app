@@ -18,8 +18,7 @@ import java.util.List;
 public class EntrenadorController {
     
     private final EntrenadorService entrenadorService;
-    
-    // CREATE - Crear nuevo entrenador
+
     @PostMapping
     public ResponseEntity<EntrenadorDTO> crearEntrenador(@Valid @RequestBody EntrenadorDTO entrenadorDTO) {
         try {
@@ -30,14 +29,14 @@ public class EntrenadorController {
         }
     }
     
-    // READ - Obtener todos los entrenadores
+
     @GetMapping
     public ResponseEntity<List<EntrenadorDTO>> obtenerTodosLosEntrenadores() {
         List<EntrenadorDTO> entrenadores = entrenadorService.obtenerTodosLosEntrenadores();
         return ResponseEntity.ok(entrenadores);
     }
     
-    // READ - Obtener entrenador por ID
+
     @GetMapping("/{id}")
     public ResponseEntity<EntrenadorDTO> obtenerEntrenadorPorId(@PathVariable Integer id) {
         try {
@@ -48,14 +47,14 @@ public class EntrenadorController {
         }
     }
     
-    // READ - Buscar entrenadores por nombre
-    @GetMapping("/buscar")
+
+    @GetMapping("/buscar/nombre")
     public ResponseEntity<List<EntrenadorDTO>> buscarEntrenadoresPorNombre(@RequestParam String nombre) {
         List<EntrenadorDTO> entrenadores = entrenadorService.buscarEntrenadoresPorNombre(nombre);
         return ResponseEntity.ok(entrenadores);
     }
     
-    // UPDATE - Actualizar entrenador
+
     @PutMapping("/{id}")
     public ResponseEntity<EntrenadorDTO> actualizarEntrenador(
             @PathVariable Integer id, 
@@ -68,7 +67,7 @@ public class EntrenadorController {
         }
     }
     
-    // DELETE - Eliminar entrenador
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEntrenador(@PathVariable Integer id) {
         try {
