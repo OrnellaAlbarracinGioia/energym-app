@@ -1,5 +1,6 @@
 package com.energym.energym_reservas.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -32,9 +33,11 @@ public class Clase {
     private Actividad actividad;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime horario;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fecha;
 
     // Relación con Entrenador (muchas actividades pueden tener el mismo entrenador)
@@ -50,7 +53,7 @@ public class Clase {
 
     @NotNull(message = "La capacidad maxima de la clase es requerida")
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
-    @Column(nullable = false)
+    @Column(name = "capacidad_maxima", nullable = false)
     private Integer capacidadMaxima;
 
     @OneToMany(mappedBy = "clase", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

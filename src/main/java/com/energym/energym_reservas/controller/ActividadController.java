@@ -45,7 +45,7 @@ public class ActividadController {
      */
     @PostMapping
     @Operation(summary = "Crear nueva actividad", description = "Crea una nueva actividad en el sistema")
-    public ResponseEntity<ActividadDTO> createActividad(@Valid @RequestBody ActividadDTO actividadDTO) {
+    public ResponseEntity<ActividadDTO> createActividad( @Valid @RequestBody ActividadDTO actividadDTO) {
         ActividadDTO nuevaActividad = actividadService.createActividad(actividadDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaActividad);
     }

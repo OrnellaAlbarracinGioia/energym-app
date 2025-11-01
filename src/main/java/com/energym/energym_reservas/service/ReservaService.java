@@ -5,12 +5,13 @@ import com.energym.energym_reservas.entity.Clase;
 import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Reserva;
 import com.energym.energym_reservas.entity.Socio;
+import com.energym.energym_reservas.exception.CapacidadLlenaException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.repository.ClaseRepository;
 import com.energym.energym_reservas.repository.ReservaRepository;
 import com.energym.energym_reservas.repository.SocioRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
@@ -28,21 +30,26 @@ public class ReservaService {
     private final ClaseRepository claseRepository;
 
     // CREATE valida
-    public ReservaDTO crearReserva(ReservaDTO reservaDTO) {
+    public ReservaDTO crearReserva(ReservaDTO reservaDTO) throws CapacidadLlenaException {
         Socio socio = socioRepository.findById(reservaDTO.getSocioId())
                 .orElseThrow(() -> new RuntimeException("Socio no encontrado con id: " + reservaDTO.getSocioId()));
 
-        if(!socio.getActivo())
+        if(!socio.getActivo()) {
             throw new IllegalStateException("Socio no se encuentra activo");
-
+        }
         Clase clase = claseRepository.findById(reservaDTO.getClaseId())
                 .orElseThrow(() -> new RuntimeException("Clase no encontrada con id: " + reservaDTO.getClaseId()));
 
-        Integer cuposDisponibles = verificarDisponibilidad(clase.getId(), Estado.CONFIRMADA);
+        Integer cuposDisponibles = verificarDisponibilidad(clase.getId());
+
+        System.out.println("CuposDisponibles: " + cuposDisponibles);
 
         if(cuposDisponibles <= 0){
-            throw new IllegalStateException("La clase '" + clase.getActividad().getNombre() + "' del " + clase.getFecha() +
-                    " a las " + clase.getHorario() + " está llena. ");
+            throw new CapacidadLlenaException(
+                    "La clase '" + clase.getActividad().getNombre() + "' está llena",
+                    clase.getActividad().getNombre(),
+                    cuposDisponibles
+            );
         }
 
         Reserva reserva = Reserva.builder()
@@ -50,23 +57,11 @@ public class ReservaService {
                 .clase(clase)
                 .build();
 
-        return convertirADTO(reservaRepository.save(reserva));
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+        log.info("Reserva creada. ID: {}", reservaGuardada.getId());
+
+        return convertirADTO(reservaGuardada);
     }
-
-
-    @Transactional(readOnly = true)
-    public Integer verificarDisponibilidad(Integer claseId, Estado estado) {
-        Clase clase = claseRepository.findById(claseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Clase no encontrada"));
-
-        Integer reservasConfirmadas = reservaRepository
-                .countByClaseIdAndEstado(claseId, estado);
-
-        Integer capacidadMaxima = clase.getCapacidadMaxima();
-
-        return capacidadMaxima - reservasConfirmadas;
-    }
-
 
     // READ - Obtener todas las reservas
     @Transactional(readOnly = true)
@@ -118,6 +113,8 @@ public class ReservaService {
         }
 
         Reserva reservaActualizada = reservaRepository.save(reserva);
+        log.info("Reserva {} actualizada", id);
+
         return convertirADTO(reservaActualizada);
     }
 
@@ -134,6 +131,7 @@ public class ReservaService {
         reserva.setFechaCancelacion(LocalDateTime.now());
 
         Reserva reservaActualizada = reservaRepository.save(reserva);
+        log.info("Reserva {} cancelada", id);
         return convertirADTO(reservaActualizada);
     }
 
@@ -143,6 +141,19 @@ public class ReservaService {
             throw new RuntimeException("Reserva no encontrada con id: " + id);
         }
         reservaRepository.deleteById(id);
+        log.info("Reserva {} eliminada", id);
+    }
+
+    private Integer verificarDisponibilidad(Integer claseId) {
+        Clase clase = claseRepository.findById(claseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clase no encontrada"));
+
+        Integer reservasConfirmadas = reservaRepository
+                .countByClaseIdAndEstado(claseId, Estado.CONFIRMADA);
+
+        Integer capacidadMaxima = clase.getCapacidadMaxima();
+
+        return capacidadMaxima - reservasConfirmadas;
     }
 
     // Metodo auxiliar para convertir entidad a DTO

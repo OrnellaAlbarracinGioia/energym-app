@@ -27,7 +27,6 @@ public class ReservaDTO {
     
     private LocalDateTime fecha;
 
-    @NotNull(message = "El estado es obligatorio")
     private String estado; // CONFIRMADA, CANCELADA, COMPLETADA
     
     private LocalDateTime fechaCancelacion;

@@ -32,17 +32,19 @@ public class Socio {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro;
 
     @Column(nullable = false)
     private String telefono;
+
 
     private Boolean activo = true;
 
     /*Esta forma permite que se detecten no solo el beneficio de 10 actividades completas en un mes,
     sino que puede contemplar otro tipo de factores utilizando la misma lógica
     * */
+    @Column(name = "clases_personalizadas")
     private Integer clasesPersonalizadas;
 
     // Relacion con Reservas

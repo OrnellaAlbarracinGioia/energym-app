@@ -1,5 +1,6 @@
 package com.energym.energym_reservas.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -27,6 +28,7 @@ public class Actividad {
     private String descripcion;
 
     @NotNull(message = "La duración es obligatoria")
+    @Column(name = "duracion_minutos", nullable = false)
     private Integer duracionMinutos;
 
 }
