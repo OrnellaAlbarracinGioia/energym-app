@@ -26,7 +26,7 @@ public class ActividadService {
     @Transactional(readOnly = true)
     public List<ActividadDTO> getAllActividades() {
         return actividadRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
@@ -38,7 +38,7 @@ public class ActividadService {
 
         Actividad actividad = actividadRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
-        return convertToDTO(actividad);
+        return convertirADTO(actividad);
     }
 
     /**
@@ -54,7 +54,7 @@ public class ActividadService {
                 .build();
 
         Actividad savedActividad = actividadRepository.save(actividad);
-        return convertToDTO(savedActividad);
+        return convertirADTO(savedActividad);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ActividadService {
 
 
         Actividad updatedActividad = actividadRepository.save(actividad);
-        return convertToDTO(updatedActividad);
+        return convertirADTO(updatedActividad);
     }
 
     /**
@@ -88,7 +88,7 @@ public class ActividadService {
     /**
      * Convertir entidad a DTO
      */
-    private ActividadDTO convertToDTO(Actividad actividad) {
+    private ActividadDTO convertirADTO(Actividad actividad) {
         return ActividadDTO.builder()
                 .id(actividad.getId())
                 .nombre(actividad.getNombre())

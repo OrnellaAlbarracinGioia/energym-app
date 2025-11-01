@@ -1,8 +1,10 @@
 package com.energym.energym_reservas.service;
 
+import com.energym.energym_reservas.dto.ReservaDTO;
 import com.energym.energym_reservas.dto.SocioDTO;
 import com.energym.energym_reservas.entity.Socio;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
+import com.energym.energym_reservas.repository.ReservaRepository;
 import com.energym.energym_reservas.repository.SocioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class SocioService {
 
     private final SocioRepository socioRepository;
+    private final ReservaService reservaService;
 
     /**
      * Obtener todos los socios
@@ -25,7 +28,7 @@ public class SocioService {
     @Transactional(readOnly = true)
     public List<SocioDTO> getAllSocios() {
         return socioRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
@@ -36,7 +39,7 @@ public class SocioService {
     public SocioDTO getSocioById(Integer id) {
         Socio socio = socioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
-        return convertToDTO(socio);
+        return convertirADTO(socio);
     }
 
     /**
@@ -58,7 +61,7 @@ public class SocioService {
                 .build();
 
         Socio savedSocio = socioRepository.save(socio);
-        return convertToDTO(savedSocio);
+        return convertirADTO(savedSocio);
     }
 
     /**
@@ -83,7 +86,7 @@ public class SocioService {
         }
 
         Socio updatedSocio = socioRepository.save(socio);
-        return convertToDTO(updatedSocio);
+        return convertirADTO(updatedSocio);
     }
 
     /**
@@ -115,7 +118,7 @@ public class SocioService {
     @Transactional(readOnly = true)
     public List<SocioDTO> getSociosActivos() {
         return socioRepository.findByActivoTrue().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
@@ -130,7 +133,7 @@ public class SocioService {
     /**
      * Convertir entidad a DTO
      */
-    private SocioDTO convertToDTO(Socio socio) {
+    private SocioDTO convertirADTO(Socio socio) {
 
         return SocioDTO.builder()
                 .id(socio.getId())
@@ -141,5 +144,12 @@ public class SocioService {
                 .activo(socio.getActivo())
                 .clasesPersonalizadas(socio.getClasesPersonalizadas())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> obtenerHistorialAsistencia(Integer socioId) {
+        socioRepository.findById(socioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado"));
+        return reservaService.obtenerReservasCompletadasPorSocio(socioId);
     }
 }

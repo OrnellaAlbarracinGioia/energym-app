@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -100,6 +101,18 @@ public class ReservaService {
     @Transactional(readOnly = true)
     public List<ReservaDTO> obtenerReservasPorSocio(Integer socioId) {
         return reservaRepository.findBySocioId(socioId).stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> obtenerReservasCompletadasPorSocio(Integer socioId) {
+        socioRepository.findById(socioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado"));
+
+        return reservaRepository.findBySocioIdAndEstado(socioId, Estado.COMPLETADA)
+                .stream()
+                .sorted(Comparator.comparing((Reserva r) -> r.getClase().getFecha()).reversed())
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }

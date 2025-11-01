@@ -24,4 +24,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     boolean existsBySocioIdAndClaseIdAndEstado(Integer socioId, Integer claseId, Estado estado);
 
     Integer countBySocioIdAndEstadoAndClaseFechaBetween(Integer socioId, Estado estado, LocalDate fechaInicio, LocalDate fechaFin);
+
+    List<Reserva> findBySocioIdAndEstado(Integer socioId, Estado estado);
 }

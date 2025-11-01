@@ -1,5 +1,6 @@
 package com.energym.energym_reservas.controller;
 
+import com.energym.energym_reservas.dto.ReservaDTO;
 import com.energym.energym_reservas.dto.SocioDTO;
 import com.energym.energym_reservas.service.SocioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ public class SocioController {
 
     private final SocioService socioService;
 
+
     /**
      * Obtener todos los socios
      */
@@ -31,9 +33,17 @@ public class SocioController {
     }
 
     @GetMapping("/{socioId}/clases-personalizadas")
+    @Operation(summary = "Obtener clases personalizadas", description = "Devuelve las clases personalizadas disponibles de un Socio")
     public ResponseEntity<Integer> obtenerClasesPersonalizadas(@PathVariable Integer socioId) {
         SocioDTO socio = socioService.getSocioById(socioId);
         return ResponseEntity.ok(socio.getClasesPersonalizadas());
+    }
+
+    @GetMapping("/{socioId}/historial-asistencia")
+    @Operation(summary = "Obtener historial de asistencia")
+    public ResponseEntity<List<ReservaDTO>> obtenerHistorialAsistencia(@PathVariable Integer socioId) {
+        List<ReservaDTO> historial = socioService.obtenerHistorialAsistencia(socioId);
+        return ResponseEntity.ok(historial);
     }
 
     /**
