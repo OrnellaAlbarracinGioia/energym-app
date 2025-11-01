@@ -46,4 +46,6 @@ public class ClaseDTO {
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
     private Integer capacidadMaxima;
 
+    private Boolean esPersonalizada = false;
+
 }

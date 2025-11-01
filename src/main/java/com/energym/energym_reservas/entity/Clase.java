@@ -59,4 +59,7 @@ public class Clase {
     @OneToMany(mappedBy = "clase", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reserva> reservas = new ArrayList<>();
 
+    @Column(name = "es_personalizada")
+    private Boolean esPersonalizada = false;
+
 }

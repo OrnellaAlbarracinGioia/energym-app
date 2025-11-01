@@ -10,7 +10,6 @@ import java.util.List;
 public interface SocioRepository extends JpaRepository<Socio, Integer> {
 
     boolean existsByEmail(String email);
-
     List<Socio> findByActivoTrue();
 
 }

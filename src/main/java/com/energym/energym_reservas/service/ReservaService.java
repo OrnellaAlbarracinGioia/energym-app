@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -141,6 +142,15 @@ public class ReservaService {
 
         if (!reserva.getEstado().equals(Estado.CONFIRMADA)) {
             throw new RuntimeException("Solo se pueden cancelar reservas confirmadas");
+        }
+
+        if (Boolean.TRUE.equals(reserva.getClase().getEsPersonalizada())) {
+
+            Socio socio = socioRepository.findById(reserva.getSocio().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado"));
+
+            socio.setClasesPersonalizadas(socio.getClasesPersonalizadas() + 1);
+            socioRepository.save(socio);
         }
 
         reserva.setEstado(Estado.CANCELADA);
