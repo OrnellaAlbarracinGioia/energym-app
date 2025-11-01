@@ -36,7 +36,7 @@ public class EntrenadorController {
         return ResponseEntity.ok(entrenadores);
     }
     
-
+/*
     @GetMapping("/{id}")
     public ResponseEntity<EntrenadorDTO> obtenerEntrenadorPorId(@PathVariable Integer id) {
         try {
@@ -45,14 +45,15 @@ public class EntrenadorController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
     
-
+    /*
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<EntrenadorDTO>> buscarEntrenadoresPorNombre(@RequestParam String nombre) {
         List<EntrenadorDTO> entrenadores = entrenadorService.buscarEntrenadoresPorNombre(nombre);
         return ResponseEntity.ok(entrenadores);
     }
+  */
     
 
     @PutMapping("/{id}")

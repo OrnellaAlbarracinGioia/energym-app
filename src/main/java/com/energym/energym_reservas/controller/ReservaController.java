@@ -44,6 +44,7 @@ public class ReservaController {
         }
     }
 
+/*
     @GetMapping("/{id}")
     public ResponseEntity<ReservaDTO> obtenerReservaPorId(@PathVariable Integer id) {
         try {
@@ -53,7 +54,7 @@ public class ReservaController {
             log.error(" Error al obtener reserva: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-    }
+    }*/
 
     @GetMapping("/socio/{socioId}")
     public ResponseEntity<List<ReservaDTO>> obtenerReservasPorSocio(@PathVariable Integer socioId) {
@@ -65,6 +66,7 @@ public class ReservaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     @GetMapping("/clase/{claseId}")
     public ResponseEntity<List<ReservaDTO>> obtenerReservasPorClase(@PathVariable Integer claseId) {
@@ -88,7 +90,7 @@ public class ReservaController {
         }
     }
 
-    @PutMapping("/{id}")
+/*    @PutMapping("/{id}")
     public ResponseEntity<ReservaDTO> actualizarReserva(
             @PathVariable Integer id,
             @Valid @RequestBody ReservaDTO reservaDTO) {
@@ -100,7 +102,7 @@ public class ReservaController {
             log.error(" Error al actualizar reserva: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-    }
+    }*/
 
     @PatchMapping("/{id}/marcar-asistencia")
     public ResponseEntity<ReservaDTO> marcarAsistencia(

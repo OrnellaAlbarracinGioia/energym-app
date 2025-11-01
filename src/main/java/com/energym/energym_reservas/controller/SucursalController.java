@@ -49,21 +49,21 @@ public class SucursalController {
         }
     }
     
-    // READ - Buscar sucursales por nombre
+    /* READ - Buscar sucursales por nombre
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<SucursalDTO>> buscarSucursalesPorNombre(@RequestParam String nombre) {
         List<SucursalDTO> sucursales = sucursalService.buscarSucursalesPorNombre(nombre);
         return ResponseEntity.ok(sucursales);
-    }
+    }*/
     
-    // READ - Buscar sucursales por dirección
+    /* READ - Buscar sucursales por dirección
     @GetMapping("/buscar/direccion")
     public ResponseEntity<List<SucursalDTO>> buscarSucursalesPorDireccion(@RequestParam String direccion) {
         List<SucursalDTO> sucursales = sucursalService.buscarSucursalesPorDireccion(direccion);
         return ResponseEntity.ok(sucursales);
-    }
+    }*/
     
-    // UPDATE - Actualizar sucursal
+    /* UPDATE - Actualizar sucursal
     @PutMapping("/{id}")
     public ResponseEntity<SucursalDTO> actualizarSucursal(
             @PathVariable Integer id, 
@@ -74,7 +74,7 @@ public class SucursalController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
     
     // DELETE - Eliminar sucursal
     @DeleteMapping("/{id}")

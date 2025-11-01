@@ -86,8 +86,8 @@ public class SocioController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Eliminar permanentemente un socio
+    /*
+      Eliminar permanentemente un socio
      */
     @DeleteMapping("/{id}/permanente")
     @Operation(summary = "Eliminar socio permanentemente", description = "Elimina un socio de forma permanente (hard delete)")
@@ -97,14 +97,14 @@ public class SocioController {
     }
 
 
-    /**
-     * Obtener socios activos
-     */
+    /*
+      Obtener socios activos
+
     @GetMapping("/activos")
     @Operation(summary = "Obtener socios activos", description = "Retorna solo los socios activos")
     public ResponseEntity<List<SocioDTO>> getSociosActivos() {
         List<SocioDTO> socios = socioService.getSociosActivos();
         return ResponseEntity.ok(socios);
-    }
+    } */
 
 }
