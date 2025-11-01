@@ -30,7 +30,7 @@ public class Reserva {
     @Column(nullable = false)
     private LocalDateTime fecha;
 
-    @Column(name = "estado", nullable = false)
+    @Column(name = "estado")
     private Estado estado; // CONFIRMADA, CANCELADA, COMPLETADA, PENDIENTE
 
     @Column(name = "fecha_cancelacion")
