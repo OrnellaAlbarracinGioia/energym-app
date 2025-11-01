@@ -26,6 +26,5 @@ public class ActividadDTO {
 
     private String descripcion;
 
-    @JsonProperty("duracionMinutos")
     private Integer duracionMinutos;
 }

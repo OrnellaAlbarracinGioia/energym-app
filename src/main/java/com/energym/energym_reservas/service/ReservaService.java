@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,25 +32,36 @@ public class ReservaService {
 
     // CREATE valida
     public ReservaDTO crearReserva(ReservaDTO reservaDTO) throws CapacidadLlenaException {
+
         Socio socio = socioRepository.findById(reservaDTO.getSocioId())
                 .orElseThrow(() -> new RuntimeException("Socio no encontrado con id: " + reservaDTO.getSocioId()));
 
         if(!socio.getActivo()) {
             throw new IllegalStateException("Socio no se encuentra activo");
         }
+
         Clase clase = claseRepository.findById(reservaDTO.getClaseId())
                 .orElseThrow(() -> new RuntimeException("Clase no encontrada con id: " + reservaDTO.getClaseId()));
 
-        Integer cuposDisponibles = verificarDisponibilidad(clase.getId());
+        if (clase.getFecha().isBefore(LocalDate.now())) {
+            throw new IllegalStateException("No se puede reservar una clase que ya pasó");
+        }
 
-        System.out.println("CuposDisponibles: " + cuposDisponibles);
+        boolean yaReservado = reservaRepository.existsBySocioIdAndClaseIdAndEstado(
+                reservaDTO.getSocioId(),
+                reservaDTO.getClaseId(),
+                Estado.CONFIRMADA
+        );
+
+        if (yaReservado) {
+            throw new IllegalStateException("El socio ya tiene una reserva confirmada en esta clase");
+        }
+
+        Integer cuposDisponibles = verificarDisponibilidad(clase.getId());
 
         if(cuposDisponibles <= 0){
             throw new CapacidadLlenaException(
-                    "La clase '" + clase.getActividad().getNombre() + "' está llena",
-                    clase.getActividad().getNombre(),
-                    cuposDisponibles
-            );
+                    "La clase '" + clase.getActividad().getNombre() + "' está llena", clase.getActividad().getNombre(), cuposDisponibles);
         }
 
         Reserva reserva = Reserva.builder()
@@ -143,6 +155,23 @@ public class ReservaService {
         reservaRepository.deleteById(id);
         log.info("Reserva {} eliminada", id);
     }
+
+    public ReservaDTO marcarAsistencia(Integer reservaId, Boolean asistio) {
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+
+        if (reserva.getClase().getFecha().isAfter(LocalDate.now())) {
+            throw new IllegalStateException("No se puede marcar asistencia antes de que la clase ocurra");
+        }
+
+        if (asistio) {
+            reserva.setEstado(Estado.COMPLETADA);
+        }
+
+        reservaRepository.save(reserva);
+        return convertirADTO(reserva);
+    }
+
 
     private Integer verificarDisponibilidad(Integer claseId) {
         Clase clase = claseRepository.findById(claseId)

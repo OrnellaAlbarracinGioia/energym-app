@@ -25,8 +25,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     
     List<Reserva> findByEstado(Estado estado);
 
-    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.socio.id = :socioId AND r.clase.id = :claseId")
-    boolean existsReservaActivaBySocioAndClase(@Param("socioId")Integer socioId, @Param("claseId")Integer claseId);
+    boolean existsBySocioIdAndClaseIdAndEstado(Integer socioId, Integer claseId, Estado estado);
 
     Reserva getReservaBySocioIdAndClaseId(Integer socioId, Integer claseId);
 }
