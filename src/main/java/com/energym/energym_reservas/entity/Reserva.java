@@ -1,15 +1,13 @@
 package com.energym.energym_reservas.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name="reservas")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +28,7 @@ public class Reserva {
     @Column(nullable = false)
     private LocalDateTime fecha;
 
-    @Column(name = "estado")
+    @Column(name = "estado", nullable = false)
     private Estado estado; // CONFIRMADA, CANCELADA, COMPLETADA, PENDIENTE
 
     @Column(name = "fecha_cancelacion")

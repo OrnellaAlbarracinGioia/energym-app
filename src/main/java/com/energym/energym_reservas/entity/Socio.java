@@ -3,17 +3,15 @@ package com.energym.energym_reservas.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name="socios")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,12 +21,9 @@ public class Socio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "El nombre es solicitado")
     @Column(nullable = false)
     private String nombre;
 
-    @NotBlank(message = "El email es obligatorio")
-    @Email(message = "El email debe ser válido")
     @Column(nullable = false, unique = true)
     private String email;
 
