@@ -4,7 +4,6 @@ import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Reserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -20,6 +19,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     List<Reserva> findByClaseId(Integer claseId);
     
     List<Reserva> findByEstado(Estado estado);
+
+    @Query("SELECT r FROM Reserva r JOIN FETCH r.socio JOIN FETCH r.clase c JOIN FETCH c.actividad")
+    List<Reserva> findAllConRelaciones();
 
     boolean existsBySocioIdAndClaseIdAndEstado(Integer socioId, Integer claseId, Estado estado);
 
