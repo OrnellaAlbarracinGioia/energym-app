@@ -1,7 +1,8 @@
 package com.energym.energym_reservas.controller;
 
-import com.energym.energym_reservas.dto.ReservaDTO;
-import com.energym.energym_reservas.dto.SocioDTO;
+import com.energym.energym_reservas.dto.request.SocioRequestDTO;
+import com.energym.energym_reservas.dto.response.ReservaResponseDTO;
+import com.energym.energym_reservas.dto.response.SocioResponseDTO;
 import com.energym.energym_reservas.service.SocioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,28 +22,27 @@ public class SocioController {
 
     private final SocioService socioService;
 
-
     /**
      * Obtener todos los socios
      */
     @GetMapping
     @Operation(summary = "Obtener todos los socios", description = "Retorna una lista de todos los socios registrados")
-    public ResponseEntity<List<SocioDTO>> getAllSocios() {
-        List<SocioDTO> socios = socioService.getAllSocios();
+    public ResponseEntity<List<SocioResponseDTO>> getAllSocios() {
+        List<SocioResponseDTO> socios = socioService.getAllSocios();
         return ResponseEntity.ok(socios);
     }
 
-    @GetMapping("/{socioId}/clases-personalizadas")
+    @GetMapping("/{id}/clases-personalizadas")
     @Operation(summary = "Obtener clases personalizadas", description = "Devuelve las clases personalizadas disponibles de un Socio")
-    public ResponseEntity<Integer> obtenerClasesPersonalizadas(@PathVariable Integer socioId) {
-        SocioDTO socio = socioService.getSocioById(socioId);
+    public ResponseEntity<Integer> obtenerClasesPersonalizadas(@PathVariable Integer id) {
+        SocioResponseDTO socio = socioService.getSocioById(id);
         return ResponseEntity.ok(socio.getClasesPersonalizadas());
     }
 
-    @GetMapping("/{socioId}/historial-asistencia")
+    @GetMapping("/{id}/historial-asistencia")
     @Operation(summary = "Obtener historial de asistencia")
-    public ResponseEntity<List<ReservaDTO>> obtenerHistorialAsistencia(@PathVariable Integer socioId) {
-        List<ReservaDTO> historial = socioService.obtenerHistorialAsistencia(socioId);
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialAsistencia(@PathVariable Integer id) {
+        List<ReservaResponseDTO> historial = socioService.obtenerHistorialAsistencia(id);
         return ResponseEntity.ok(historial);
     }
 
@@ -51,8 +51,8 @@ public class SocioController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Obtener socio por ID", description = "Retorna los detalles de un socio específico")
-    public ResponseEntity<SocioDTO> getSocioById(@PathVariable Integer id) {
-        SocioDTO socio = socioService.getSocioById(id);
+    public ResponseEntity<SocioResponseDTO> getSocioById(@PathVariable Integer id) {
+        SocioResponseDTO socio = socioService.getSocioById(id);
         return ResponseEntity.ok(socio);
     }
 
@@ -61,8 +61,8 @@ public class SocioController {
      */
     @PostMapping
     @Operation(summary = "Crear nuevo socio", description = "Registra un nuevo socio en el sistema")
-    public ResponseEntity<SocioDTO> createSocio(@Valid @RequestBody SocioDTO socioDTO) {
-        SocioDTO nuevoSocio = socioService.createSocio(socioDTO);
+    public ResponseEntity<SocioResponseDTO> createSocio(@Valid @RequestBody SocioRequestDTO request) {
+        SocioResponseDTO nuevoSocio = socioService.createSocio(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoSocio);
     }
 
@@ -71,8 +71,8 @@ public class SocioController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar socio", description = "Actualiza los datos de un socio existente")
-    public ResponseEntity<SocioDTO> updateSocio(@PathVariable Integer id, @Valid @RequestBody SocioDTO socioDTO) {
-        SocioDTO socioActualizado = socioService.updateSocio(id, socioDTO);
+    public ResponseEntity<SocioResponseDTO> updateSocio(@PathVariable Integer id, @Valid @RequestBody SocioRequestDTO request) {
+        SocioResponseDTO socioActualizado = socioService.updateSocio(id, request);
         return ResponseEntity.ok(socioActualizado);
     }
 
@@ -95,16 +95,5 @@ public class SocioController {
         socioService.deleteSocioPermanente(id);
         return ResponseEntity.noContent().build();
     }
-
-
-    /*
-      Obtener socios activos
-
-    @GetMapping("/activos")
-    @Operation(summary = "Obtener socios activos", description = "Retorna solo los socios activos")
-    public ResponseEntity<List<SocioDTO>> getSociosActivos() {
-        List<SocioDTO> socios = socioService.getSociosActivos();
-        return ResponseEntity.ok(socios);
-    } */
 
 }

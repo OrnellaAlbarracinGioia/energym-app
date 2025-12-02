@@ -1,18 +1,21 @@
 package com.energym.energym_reservas.service;
 
-import com.energym.energym_reservas.dto.ReservaDTO;
-import com.energym.energym_reservas.dto.SocioDTO;
+import com.energym.energym_reservas.dto.request.SocioRequestDTO;
+import com.energym.energym_reservas.dto.response.ReservaResponseDTO;
+import com.energym.energym_reservas.dto.response.SocioResponseDTO;
+import com.energym.energym_reservas.entity.Estado;
+import com.energym.energym_reservas.entity.Reserva;
 import com.energym.energym_reservas.entity.Socio;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
+import com.energym.energym_reservas.mapper.ReservaMapper;
+import com.energym.energym_reservas.mapper.SocioMapper;
 import com.energym.energym_reservas.repository.ReservaRepository;
 import com.energym.energym_reservas.repository.SocioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,73 +23,62 @@ import java.util.stream.Collectors;
 public class SocioService {
 
     private final SocioRepository socioRepository;
-    private final ReservaService reservaService;
+    private final SocioMapper socioMapper;
+
+    private final ReservaRepository reservaRepository;
+    private final ReservaMapper reservaMapper;
 
     /**
      * Obtener todos los socios
      */
     @Transactional(readOnly = true)
-    public List<SocioDTO> getAllSocios() {
-        return socioRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<SocioResponseDTO> getAllSocios() {
+        List<Socio> socios = socioRepository.findAll();
+        return socioMapper.toResponseList(socios);
     }
 
     /**
      * Obtener un socio por ID
      */
     @Transactional(readOnly = true)
-    public SocioDTO getSocioById(Integer id) {
+    public SocioResponseDTO getSocioById(Integer id) {
         Socio socio = socioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
-        return convertirADTO(socio);
+        return socioMapper.toResponseDTO(socio);
     }
 
     /**
      * Crear un nuevo socio
      */
-    public SocioDTO createSocio(SocioDTO socioDTO) {
+    public SocioResponseDTO createSocio(SocioRequestDTO request) {
         // Validar que el email no esté registrado
-        if (socioRepository.existsByEmail(socioDTO.getEmail())) {
-            throw new IllegalArgumentException("El email ya está registrado: " + socioDTO.getEmail());
+        if (socioRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("El email ya está registrado: " + request.getEmail());
         }
 
-        Socio socio = Socio.builder()
-                .nombre(socioDTO.getNombre())
-                .email(socioDTO.getEmail())
-                .telefono(socioDTO.getTelefono())
-                .fechaRegistro(LocalDateTime.now())
-                .activo(true)
-                .clasesPersonalizadas(0)
-                .build();
-
+        Socio socio = socioMapper.toEntity(request);
         Socio savedSocio = socioRepository.save(socio);
-        return convertirADTO(savedSocio);
+        return socioMapper.toResponseDTO(savedSocio);
+
     }
 
     /**
      * Actualizar un socio existente
      */
-    public SocioDTO updateSocio(Integer id, SocioDTO socioDTO) {
+    public SocioResponseDTO updateSocio(Integer id, SocioRequestDTO request) {
         Socio socio = socioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
 
         // Validar email único si cambió
-        if (!socio.getEmail().equals(socioDTO.getEmail()) &&
-                socioRepository.existsByEmail(socioDTO.getEmail())) {
-            throw new IllegalArgumentException("El email ya está registrado: " + socioDTO.getEmail());
+        if (!socio.getEmail().equals(request.getEmail()) &&
+                socioRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("El email ya está registrado: " + request.getEmail());
         }
 
-        socio.setNombre(socioDTO.getNombre());
-        socio.setEmail(socioDTO.getEmail());
-        socio.setTelefono(socioDTO.getTelefono());
+        socioMapper.updateSocioFromRequest(request, socio);
 
-        if (socioDTO.getActivo() != null) {
-            socio.setActivo(socioDTO.getActivo());
-        }
-
-        Socio updatedSocio = socioRepository.save(socio);
-        return convertirADTO(updatedSocio);
+        Socio savedSocio = socioRepository.save(socio);
+        return socioMapper.toResponseDTO(savedSocio);
     }
 
     /**
@@ -96,30 +88,24 @@ public class SocioService {
         Socio socio = socioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
 
-        // Soft delete: marcar como inactivo en lugar de eliminar físicamente
+        //Marcar como inactivo en lugar de eliminar físicamente
         socio.setActivo(false);
-        socioRepository.save(socio);
     }
 
     /**
-     * Eliminar permanentemente un socio (hard delete)
+     * Eliminar permanentemente un socio
      */
     public void deleteSocioPermanente(Integer id) {
         if (!socioRepository.existsById(id)) {
             throw new ResourceNotFoundException("Socio no encontrado con id: " + id);
         }
+
+        boolean tieneHistorial = reservaRepository.existsBySocioId(id);
+        if(tieneHistorial){
+            throw new RuntimeException("No es posible eliminar un socio que cuenta con historial de reservas");
+        }
+
         socioRepository.deleteById(id);
-    }
-
-
-    /**
-     * Obtener socios activos
-     */
-    @Transactional(readOnly = true)
-    public List<SocioDTO> getSociosActivos() {
-        return socioRepository.findByActivoTrue().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
     }
 
     public void beneficioClasePersonalizadaGratuita(Integer id) {
@@ -130,26 +116,13 @@ public class SocioService {
         socio.setClasesPersonalizadas(clasesActualizadas);
     }
 
-    /**
-     * Convertir entidad a DTO
-     */
-    private SocioDTO convertirADTO(Socio socio) {
-
-        return SocioDTO.builder()
-                .id(socio.getId())
-                .nombre(socio.getNombre())
-                .email(socio.getEmail())
-                .telefono(socio.getTelefono())
-                .fechaRegistro(socio.getFechaRegistro())
-                .activo(socio.getActivo())
-                .clasesPersonalizadas(socio.getClasesPersonalizadas())
-                .build();
-    }
-
     @Transactional(readOnly = true)
-    public List<ReservaDTO> obtenerHistorialAsistencia(Integer socioId) {
-        socioRepository.findById(socioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado"));
-        return reservaService.obtenerReservasCompletadasPorSocio(socioId);
+    public List<ReservaResponseDTO> obtenerHistorialAsistencia(Integer socioId) {
+        if(!socioRepository.existsById(socioId)){
+            throw new ResourceNotFoundException("Socio no encontrado");
+        }
+        List<Reserva> historial = reservaRepository.findBySocioIdAndEstado(socioId, Estado.COMPLETADA);
+        return reservaMapper.toResponseList(historial);
     }
+
 }

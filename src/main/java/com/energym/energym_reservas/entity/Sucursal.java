@@ -1,7 +1,6 @@
 package com.energym.energym_reservas.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class Sucursal {
     @Column(nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String direccion;
 
     // Relación con Clases

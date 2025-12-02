@@ -13,6 +13,7 @@ public interface ClaseMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "actividad", ignore = true)
+    @Mapping(target = "personalizada", ignore = true)
     @Mapping(target = "sucursal", ignore = true)
     @Mapping(target = "entrenador", ignore = true)
     @Mapping(target = "reservas", ignore = true)

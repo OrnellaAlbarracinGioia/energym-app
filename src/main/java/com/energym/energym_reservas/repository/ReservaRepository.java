@@ -28,4 +28,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     Integer countBySocioIdAndEstadoAndClaseFechaBetween(Integer socioId, Estado estado, LocalDate fechaInicio, LocalDate fechaFin);
 
     List<Reserva> findBySocioIdAndEstado(Integer socioId, Estado estado);
+
+    boolean existsBySocioId(Integer id);
 }

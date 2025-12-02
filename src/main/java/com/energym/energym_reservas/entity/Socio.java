@@ -1,8 +1,6 @@
 package com.energym.energym_reservas.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -33,13 +31,16 @@ public class Socio {
     @Column(nullable = false)
     private String telefono;
 
+    @Builder.Default
+    @Column(nullable = false)
     private Boolean activo = true;
 
     /*Esta forma permite que se detecten no solo el beneficio de 10 actividades completas en un mes,
     sino que puede contemplar otro tipo de factores utilizando la misma lógica
     * */
+    @Builder.Default
     @Column(name = "clases_personalizadas")
-    private Integer clasesPersonalizadas;
+    private Integer clasesPersonalizadas = 0;
 
     // Relacion con Reservas
     @OneToMany(mappedBy = "socio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
