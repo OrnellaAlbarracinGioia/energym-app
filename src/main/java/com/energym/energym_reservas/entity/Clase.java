@@ -49,7 +49,8 @@ public class Clase {
     @OneToMany(mappedBy = "clase", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reserva> reservas = new ArrayList<>();
 
+    @Builder.Default //Permite que Lombok respete el false, porque sino lo ignora
     @Column(name = "es_personalizada")
-    private Boolean esPersonalizada = false;
+    private Boolean personalizada = false;
 
 }

@@ -25,8 +25,8 @@ public class Reserva {
     @JoinColumn(name = "clase_id", nullable = false)
     private Clase clase;
 
-    @Column(nullable = false)
-    private LocalDateTime fecha;
+    @Column(name = "fecha_creacion", nullable = false)
+    private LocalDateTime fechaCreacion;
 
     @Column(name = "estado", nullable = false)
     private Estado estado; // CONFIRMADA, CANCELADA, COMPLETADA, PENDIENTE
@@ -36,7 +36,7 @@ public class Reserva {
 
     @PrePersist
     protected void onCreate() {
-        fecha = LocalDateTime.now();
+        fechaCreacion = LocalDateTime.now();
         if (estado == null) {
             estado = Estado.CONFIRMADA;
         }
