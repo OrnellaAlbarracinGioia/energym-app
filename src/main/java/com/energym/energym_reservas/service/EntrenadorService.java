@@ -3,6 +3,7 @@ package com.energym.energym_reservas.service;
 import com.energym.energym_reservas.dto.request.EntrenadorRequestDTO;
 import com.energym.energym_reservas.dto.response.EntrenadorResponseDTO;
 import com.energym.energym_reservas.entity.Entrenador;
+import com.energym.energym_reservas.exception.BusinessRuleException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.mapper.EntrenadorMapper;
 import com.energym.energym_reservas.repository.ClaseRepository;
@@ -28,7 +29,7 @@ public class EntrenadorService {
     public EntrenadorResponseDTO crearEntrenador(EntrenadorRequestDTO request) {
         // Validar que no exista un entrenador con el mismo contacto
         if (entrenadorRepository.findByContacto(request.getContacto()).isPresent()) {
-            throw new RuntimeException("Ya existe un entrenador con ese contacto");
+            throw new BusinessRuleException("Ya existe un entrenador con ese contacto");
         }
         
         Entrenador entrenador = entrenadorMapper.toEntity(request);
@@ -52,7 +53,7 @@ public class EntrenadorService {
     @Transactional(readOnly = true)
     public EntrenadorResponseDTO obtenerEntrenadorPorId(Integer id) {
         Entrenador entrenador = entrenadorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entrenador no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Entrenador", "id", id));
         return entrenadorMapper.toResponseDTO(entrenador);
     }
 
@@ -70,12 +71,12 @@ public class EntrenadorService {
      */
     public EntrenadorResponseDTO actualizarEntrenador(Integer id, EntrenadorRequestDTO request) {
         Entrenador entrenador = entrenadorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entrenador no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Entrenador", "id", id));
         
         // Validar que el contacto no esté en uso por otro entrenador
         if (!entrenador.getContacto().equals(request.getContacto()) &&
             entrenadorRepository.findByContacto(request.getContacto()).isPresent()) {
-                throw new RuntimeException("Ya existe un entrenador con ese contacto");
+                throw new BusinessRuleException("Ya existe un entrenador con ese contacto");
         }
 
         entrenadorMapper.updateFromRequest(request, entrenador);
@@ -89,12 +90,12 @@ public class EntrenadorService {
      */
     public void eliminarEntrenador(Integer id) {
         if (!entrenadorRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Entrenador no encontrado con id: " + id);
+            throw new ResourceNotFoundException("Entrenador", "id", id);
         }
 
-        boolean tieneClases = claseRepository.existsEntrenadorById(id);
+        boolean tieneClases = claseRepository.existsByEntrenadorId(id);
         if(tieneClases) {
-            throw new RuntimeException("No es posible eliminar un entrenador que cuenta con clases asignadas");
+            throw new BusinessRuleException("No es posible eliminar un entrenador que cuenta con clases asignadas");
         }
         entrenadorRepository.deleteById(id);
     }

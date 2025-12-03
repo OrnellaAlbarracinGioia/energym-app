@@ -22,14 +22,9 @@ public class EntrenadorController {
 
     @PostMapping
     public ResponseEntity<EntrenadorResponseDTO> crearEntrenador(@Valid @RequestBody EntrenadorRequestDTO request) {
-        try {
-            EntrenadorResponseDTO entrenador = entrenadorService.crearEntrenador(request);
-            return new ResponseEntity<>(entrenador, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        EntrenadorResponseDTO entrenador = entrenadorService.crearEntrenador(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(entrenador);
     }
-    
 
     @GetMapping
     public ResponseEntity<List<EntrenadorResponseDTO>> obtenerTodosLosEntrenadores() {
@@ -39,12 +34,8 @@ public class EntrenadorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EntrenadorResponseDTO> obtenerEntrenadorPorId(@PathVariable Integer id) {
-        try {
-            EntrenadorResponseDTO entrenador = entrenadorService.obtenerEntrenadorPorId(id);
-            return ResponseEntity.ok(entrenador);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        EntrenadorResponseDTO entrenador = entrenadorService.obtenerEntrenadorPorId(id);
+        return ResponseEntity.ok(entrenador);
     }
 
     @GetMapping("/buscar/nombre")
@@ -53,24 +44,15 @@ public class EntrenadorController {
         return ResponseEntity.ok(entrenadores);
     }
 
-
     @PutMapping("/{id}")
     public ResponseEntity<EntrenadorResponseDTO> actualizarEntrenador(@PathVariable Integer id, @Valid @RequestBody EntrenadorRequestDTO request) {
-        try {
-            EntrenadorResponseDTO entrenador = entrenadorService.actualizarEntrenador(id, request);
-            return ResponseEntity.ok(entrenador);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        EntrenadorResponseDTO entrenador = entrenadorService.actualizarEntrenador(id, request);
+        return ResponseEntity.ok(entrenador);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEntrenador(@PathVariable Integer id) {
-        try {
-            entrenadorService.eliminarEntrenador(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        entrenadorService.eliminarEntrenador(id);
+        return ResponseEntity.noContent().build();
     }
 }

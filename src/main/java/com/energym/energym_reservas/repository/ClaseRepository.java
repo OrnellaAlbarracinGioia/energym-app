@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClaseRepository extends JpaRepository<Clase,Integer>{
-    boolean existsEntrenadorById(Integer entrenadorId);
+    boolean existsByEntrenadorId(Integer entrenadorId);
     boolean existsBySucursalId(Integer sucursalId);
     boolean existsByActividadId(Integer actividadId);
 }
