@@ -31,21 +31,21 @@ public class SocioController {
 
     @GetMapping("/{id}/clases-personalizadas")
     @Operation(summary = "Obtener clases personalizadas", description = "Devuelve las clases personalizadas disponibles de un Socio")
-    public ResponseEntity<Integer> obtenerClasesPersonalizadas(@PathVariable Integer id) {
+    public ResponseEntity<Integer> obtenerClasesPersonalizadas(@PathVariable("id") Integer id) {
         SocioResponseDTO socio = socioService.obtenerSocioPorId(id);
         return ResponseEntity.ok(socio.getClasesPersonalizadas());
     }
 
     @GetMapping("/{id}/historial-asistencia")
     @Operation(summary = "Obtener historial de asistencia")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialAsistencia(@PathVariable Integer id) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialAsistencia(@PathVariable("id") Integer id) {
         List<ReservaResponseDTO> historial = socioService.obtenerHistorialAsistencia(id);
         return ResponseEntity.ok(historial);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener socio por ID", description = "Retorna los detalles de un socio específico")
-    public ResponseEntity<SocioResponseDTO> obtenerSocioPorId(@PathVariable Integer id) {
+    public ResponseEntity<SocioResponseDTO> obtenerSocioPorId(@PathVariable("id") Integer id) {
         SocioResponseDTO socio = socioService.obtenerSocioPorId(id);
         return ResponseEntity.ok(socio);
     }
@@ -60,7 +60,7 @@ public class SocioController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar socio", description = "Actualiza los datos de un socio existente")
-    public ResponseEntity<SocioResponseDTO> updateSocio(@PathVariable Integer id, @Valid @RequestBody SocioRequestDTO request) {
+    public ResponseEntity<SocioResponseDTO> updateSocio(@PathVariable("id") Integer id, @Valid @RequestBody SocioRequestDTO request) {
         SocioResponseDTO socioActualizado = socioService.actualizarSocio(id, request);
         return ResponseEntity.ok(socioActualizado);
     }
@@ -68,14 +68,14 @@ public class SocioController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Desactivar socio", description = "Marca un socio como inactivo (soft delete)")
-    public ResponseEntity<Void> eliminarSocio(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminarSocio(@PathVariable("id") Integer id) {
         socioService.eliminarSocio(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/permanente")
     @Operation(summary = "Eliminar socio permanentemente", description = "Elimina un socio de forma permanente (hard delete)")
-    public ResponseEntity<Void> eliminarSocioPermanente(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminarSocioPermanente(@PathVariable("id") Integer id) {
         socioService.eliminarSocioPermanente(id);
         return ResponseEntity.noContent().build();
     }

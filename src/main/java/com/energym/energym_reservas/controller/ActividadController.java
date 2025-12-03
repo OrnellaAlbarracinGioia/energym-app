@@ -36,7 +36,7 @@ public class ActividadController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Obtener actividad por ID", description = "Retorna los detalles de una actividad específica")
-    public ResponseEntity<ActividadResponseDTO> obtenerActividadPorId(@PathVariable Integer id) {
+    public ResponseEntity<ActividadResponseDTO> obtenerActividadPorId(@PathVariable("id") Integer id) {
         ActividadResponseDTO actividad = actividadService.obtenerActividadPorId(id);
         return ResponseEntity.ok(actividad);
     }
@@ -56,7 +56,7 @@ public class ActividadController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar actividad", description = "Actualiza los datos de una actividad existente")
-    public ResponseEntity<ActividadResponseDTO> actualizarActividad(@PathVariable Integer id, @Valid @RequestBody ActividadRequestDTO request) {
+    public ResponseEntity<ActividadResponseDTO> actualizarActividad(@PathVariable("id") Integer id, @Valid @RequestBody ActividadRequestDTO request) {
         ActividadResponseDTO actividadActualizada = actividadService.actualizarActividad(id, request);
         return ResponseEntity.ok(actividadActualizada);
     }
@@ -66,7 +66,7 @@ public class ActividadController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar actividad", description = "Elimina una actividad del sistema")
-    public ResponseEntity<Void> eliminarActividad(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminarActividad(@PathVariable("id") Integer id) {
         actividadService.eliminarActividad(id);
         return ResponseEntity.noContent().build();
     }

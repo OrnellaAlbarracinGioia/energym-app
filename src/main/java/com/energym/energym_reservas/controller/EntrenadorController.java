@@ -33,25 +33,25 @@ public class EntrenadorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntrenadorResponseDTO> obtenerEntrenadorPorId(@PathVariable Integer id) {
+    public ResponseEntity<EntrenadorResponseDTO> obtenerEntrenadorPorId(@PathVariable("id") Integer id) {
         EntrenadorResponseDTO entrenador = entrenadorService.obtenerEntrenadorPorId(id);
         return ResponseEntity.ok(entrenador);
     }
 
     @GetMapping("/buscar/nombre")
-    public ResponseEntity<List<EntrenadorResponseDTO>> buscarEntrenadoresPorNombre(@RequestParam String nombre) {
+    public ResponseEntity<List<EntrenadorResponseDTO>> buscarEntrenadoresPorNombre(@RequestParam("nombre") String nombre) {
         List<EntrenadorResponseDTO> entrenadores = entrenadorService.buscarEntrenadoresPorNombre(nombre);
         return ResponseEntity.ok(entrenadores);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntrenadorResponseDTO> actualizarEntrenador(@PathVariable Integer id, @Valid @RequestBody EntrenadorRequestDTO request) {
+    public ResponseEntity<EntrenadorResponseDTO> actualizarEntrenador(@PathVariable("id") Integer id, @Valid @RequestBody EntrenadorRequestDTO request) {
         EntrenadorResponseDTO entrenador = entrenadorService.actualizarEntrenador(id, request);
         return ResponseEntity.ok(entrenador);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarEntrenador(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminarEntrenador(@PathVariable("id") Integer id) {
         entrenadorService.eliminarEntrenador(id);
         return ResponseEntity.noContent().build();
     }

@@ -36,39 +36,39 @@ public class ReservaController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReservaResponseDTO> obtenerReservaPorId(@PathVariable Integer id) {
+    public ResponseEntity<ReservaResponseDTO> obtenerReservaPorId(@PathVariable("id") Integer id) {
         ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(id);
         return ResponseEntity.ok(reserva);
     }
 
     @GetMapping("/socio/{socioId}")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorSocio(@PathVariable Integer socioId) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorSocio(@PathVariable("socioId") Integer socioId) {
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorSocio(socioId);
         return ResponseEntity.ok(reservas);
     }
 
 
     @GetMapping("/clase/{claseId}")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorClase(@PathVariable Integer claseId) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorClase(@PathVariable("claseId") Integer claseId) {
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorClase(claseId);
         return ResponseEntity.ok(reservas);
     }
 
     @GetMapping("/estado/{estado}")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorEstado(@PathVariable String estado) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorEstado(@PathVariable("estado") String estado) {
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorEstado(estado);
         return ResponseEntity.ok(reservas);
     }
 
 
     @PatchMapping("/{id}/marcar-asistencia")
-    public ResponseEntity<ReservaResponseDTO> marcarAsistencia(@PathVariable Integer id) {
+    public ResponseEntity<ReservaResponseDTO> marcarAsistencia(@PathVariable("id") Integer id) {
         ReservaResponseDTO reserva = reservaService.marcarAsistencia(id);
         return ResponseEntity.ok(reserva);
     }
 
     @PatchMapping("/{id}/cancelar")
-    public ResponseEntity<ReservaResponseDTO> cancelarReserva(@PathVariable Integer id) {
+    public ResponseEntity<ReservaResponseDTO> cancelarReserva(@PathVariable("id") Integer id) {
         ReservaResponseDTO reserva = reservaService.cancelarReserva(id);
         return ResponseEntity.ok(reserva);
     }

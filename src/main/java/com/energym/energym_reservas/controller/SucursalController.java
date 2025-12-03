@@ -34,31 +34,31 @@ public class SucursalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SucursalResponseDTO> obtenerSucursalPorId(@PathVariable Integer id) {
+    public ResponseEntity<SucursalResponseDTO> obtenerSucursalPorId(@PathVariable("id") Integer id) {
         SucursalResponseDTO sucursal = sucursalService.obtenerSucursalPorId(id);
         return ResponseEntity.ok(sucursal);
     }
 
     @GetMapping("/buscar/nombre")
-    public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorNombre(@RequestParam String nombre) {
+    public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorNombre(@RequestParam("nombre") String nombre) {
         List<SucursalResponseDTO> sucursales = sucursalService.buscarSucursalesPorNombre(nombre);
         return ResponseEntity.ok(sucursales);
     }
 
     @GetMapping("/buscar/direccion")
-    public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorDireccion(@RequestParam String direccion) {
+    public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorDireccion(@RequestParam("direccion") String direccion) {
         List<SucursalResponseDTO> sucursales = sucursalService.buscarSucursalesPorDireccion(direccion);
         return ResponseEntity.ok(sucursales);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SucursalResponseDTO> actualizarSucursal(@PathVariable Integer id, @Valid @RequestBody SucursalRequestDTO request) {
+    public ResponseEntity<SucursalResponseDTO> actualizarSucursal(@PathVariable("id") Integer id, @Valid @RequestBody SucursalRequestDTO request) {
         SucursalResponseDTO sucursal = sucursalService.actualizarSucursal(id, request);
         return ResponseEntity.ok(sucursal);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarSucursal(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminarSucursal(@PathVariable("id") Integer id) {
         sucursalService.eliminarSucursal(id);
         return ResponseEntity.noContent().build();
     }
