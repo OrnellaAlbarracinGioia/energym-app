@@ -6,6 +6,7 @@ import com.energym.energym_reservas.dto.response.SocioResponseDTO;
 import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Reserva;
 import com.energym.energym_reservas.entity.Socio;
+import com.energym.energym_reservas.exception.BusinessRuleException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.mapper.ReservaMapper;
 import com.energym.energym_reservas.mapper.SocioMapper;
@@ -32,7 +33,7 @@ public class SocioService {
      * Obtener todos los socios
      */
     @Transactional(readOnly = true)
-    public List<SocioResponseDTO> getAllSocios() {
+    public List<SocioResponseDTO> obtenerTodosLosSocios() {
         List<Socio> socios = socioRepository.findAll();
         return socioMapper.toResponseList(socios);
     }
@@ -41,19 +42,19 @@ public class SocioService {
      * Obtener un socio por ID
      */
     @Transactional(readOnly = true)
-    public SocioResponseDTO getSocioById(Integer id) {
+    public SocioResponseDTO obtenerSocioPorId(Integer id) {
         Socio socio = socioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Socio", "id", id));
         return socioMapper.toResponseDTO(socio);
     }
 
     /**
      * Crear un nuevo socio
      */
-    public SocioResponseDTO createSocio(SocioRequestDTO request) {
+    public SocioResponseDTO crearSocio(SocioRequestDTO request) {
         // Validar que el email no esté registrado
         if (socioRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("El email ya está registrado: " + request.getEmail());
+            throw new BusinessRuleException("El email ya está registrado: " + request.getEmail());
         }
 
         Socio socio = socioMapper.toEntity(request);
@@ -65,14 +66,14 @@ public class SocioService {
     /**
      * Actualizar un socio existente
      */
-    public SocioResponseDTO updateSocio(Integer id, SocioRequestDTO request) {
+    public SocioResponseDTO actualizarSocio(Integer id, SocioRequestDTO request) {
         Socio socio = socioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Socio", "id", id));
 
         // Validar email único si cambió
         if (!socio.getEmail().equals(request.getEmail()) &&
                 socioRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("El email ya está registrado: " + request.getEmail());
+            throw new BusinessRuleException("El email ya está registrado: " + request.getEmail());
         }
 
         socioMapper.updateFromRequest(request, socio);
@@ -82,11 +83,11 @@ public class SocioService {
     }
 
     /**
-     * Eliminar un socio (soft delete - marcar como inactivo)
+     * Eliminar un socio (marcar como inactivo)
      */
-    public void deleteSocio(Integer id) {
+    public void eliminarSocio(Integer id) {
         Socio socio = socioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Socio", "id", id));
 
         //Marcar como inactivo en lugar de eliminar físicamente
         socio.setActivo(false);
@@ -95,31 +96,37 @@ public class SocioService {
     /**
      * Eliminar permanentemente un socio
      */
-    public void deleteSocioPermanente(Integer id) {
+    public void eliminarSocioPermanente(Integer id) {
         if (!socioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Socio no encontrado con id: " + id);
+            throw new ResourceNotFoundException("Socio", "id", id);
         }
 
         boolean tieneHistorial = reservaRepository.existsBySocioId(id);
         if(tieneHistorial){
-            throw new RuntimeException("No es posible eliminar un socio que cuenta con historial de reservas");
+            throw new BusinessRuleException("No es posible eliminar un socio que cuenta con historial de reservas");
         }
 
         socioRepository.deleteById(id);
     }
 
+    /**
+     * Adicionar una clase personalizda según corresponda
+     */
     public void beneficioClasePersonalizadaGratuita(Integer id) {
         Socio socio = socioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Socio no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Socio", "id", id));
 
         Integer clasesActualizadas = socio.getClasesPersonalizadas() + 1;
         socio.setClasesPersonalizadas(clasesActualizadas);
     }
 
+    /**
+     * Obtener el Historial de Clases Asistidas
+     */
     @Transactional(readOnly = true)
     public List<ReservaResponseDTO> obtenerHistorialAsistencia(Integer socioId) {
         if(!socioRepository.existsById(socioId)){
-            throw new ResourceNotFoundException("Socio no encontrado");
+            throw new ResourceNotFoundException("Socio", "id", socioId);
         }
         List<Reserva> historial = reservaRepository.findBySocioIdAndEstado(socioId, Estado.COMPLETADA);
         return reservaMapper.toResponseList(historial);
