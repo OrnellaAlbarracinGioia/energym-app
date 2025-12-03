@@ -28,5 +28,5 @@ public interface SocioMapper {
     @Mapping(target = "clasesPersonalizadas", ignore = true)
     @Mapping(target = "reservas", ignore = true)
     @Mapping(target = "activo", ignore = true)
-    void updateSocioFromRequest(SocioRequestDTO request, @MappingTarget Socio socio);
+    void updateFromRequest(SocioRequestDTO request, @MappingTarget Socio socio);
 }

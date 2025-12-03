@@ -5,6 +5,7 @@ import com.energym.energym_reservas.dto.response.EntrenadorResponseDTO;
 import com.energym.energym_reservas.entity.Entrenador;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -17,4 +18,7 @@ public interface EntrenadorMapper {
     EntrenadorResponseDTO toResponseDTO(Entrenador entrenador);
 
     List<EntrenadorResponseDTO> toResponseList(List<Entrenador> entrenadores);
+
+    @Mapping(target = "id", ignore = true)
+    void updateFromRequest(EntrenadorRequestDTO request, @MappingTarget Entrenador entrenador);
 }

@@ -1,6 +1,7 @@
 package com.energym.energym_reservas.controller;
 
-import com.energym.energym_reservas.dto.EntrenadorDTO;
+import com.energym.energym_reservas.dto.request.EntrenadorRequestDTO;
+import com.energym.energym_reservas.dto.response.EntrenadorResponseDTO;
 import com.energym.energym_reservas.service.EntrenadorService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,9 +21,9 @@ public class EntrenadorController {
     private final EntrenadorService entrenadorService;
 
     @PostMapping
-    public ResponseEntity<EntrenadorDTO> crearEntrenador(@Valid @RequestBody EntrenadorDTO entrenadorDTO) {
+    public ResponseEntity<EntrenadorResponseDTO> crearEntrenador(@Valid @RequestBody EntrenadorRequestDTO request) {
         try {
-            EntrenadorDTO entrenador = entrenadorService.crearEntrenador(entrenadorDTO);
+            EntrenadorResponseDTO entrenador = entrenadorService.crearEntrenador(request);
             return new ResponseEntity<>(entrenador, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -31,43 +32,37 @@ public class EntrenadorController {
     
 
     @GetMapping
-    public ResponseEntity<List<EntrenadorDTO>> obtenerTodosLosEntrenadores() {
-        List<EntrenadorDTO> entrenadores = entrenadorService.obtenerTodosLosEntrenadores();
+    public ResponseEntity<List<EntrenadorResponseDTO>> obtenerTodosLosEntrenadores() {
+        List<EntrenadorResponseDTO> entrenadores = entrenadorService.obtenerTodosLosEntrenadores();
         return ResponseEntity.ok(entrenadores);
     }
-    
-/*
+
     @GetMapping("/{id}")
-    public ResponseEntity<EntrenadorDTO> obtenerEntrenadorPorId(@PathVariable Integer id) {
+    public ResponseEntity<EntrenadorResponseDTO> obtenerEntrenadorPorId(@PathVariable Integer id) {
         try {
-            EntrenadorDTO entrenador = entrenadorService.obtenerEntrenadorPorId(id);
+            EntrenadorResponseDTO entrenador = entrenadorService.obtenerEntrenadorPorId(id);
             return ResponseEntity.ok(entrenador);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    }*/
-    
-    /*
+    }
+
     @GetMapping("/buscar/nombre")
-    public ResponseEntity<List<EntrenadorDTO>> buscarEntrenadoresPorNombre(@RequestParam String nombre) {
-        List<EntrenadorDTO> entrenadores = entrenadorService.buscarEntrenadoresPorNombre(nombre);
+    public ResponseEntity<List<EntrenadorResponseDTO>> buscarEntrenadoresPorNombre(@RequestParam String nombre) {
+        List<EntrenadorResponseDTO> entrenadores = entrenadorService.buscarEntrenadoresPorNombre(nombre);
         return ResponseEntity.ok(entrenadores);
     }
-  */
-    
+
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntrenadorDTO> actualizarEntrenador(
-            @PathVariable Integer id, 
-            @Valid @RequestBody EntrenadorDTO entrenadorDTO) {
+    public ResponseEntity<EntrenadorResponseDTO> actualizarEntrenador(@PathVariable Integer id, @Valid @RequestBody EntrenadorRequestDTO request) {
         try {
-            EntrenadorDTO entrenador = entrenadorService.actualizarEntrenador(id, entrenadorDTO);
+            EntrenadorResponseDTO entrenador = entrenadorService.actualizarEntrenador(id, request);
             return ResponseEntity.ok(entrenador);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
-    
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEntrenador(@PathVariable Integer id) {

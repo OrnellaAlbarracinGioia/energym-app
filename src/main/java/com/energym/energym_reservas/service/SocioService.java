@@ -75,7 +75,7 @@ public class SocioService {
             throw new IllegalArgumentException("El email ya está registrado: " + request.getEmail());
         }
 
-        socioMapper.updateSocioFromRequest(request, socio);
+        socioMapper.updateFromRequest(request, socio);
 
         Socio savedSocio = socioRepository.save(socio);
         return socioMapper.toResponseDTO(savedSocio);

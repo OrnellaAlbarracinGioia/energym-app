@@ -1,14 +1,17 @@
 package com.energym.energym_reservas.service;
 
-import com.energym.energym_reservas.dto.EntrenadorDTO;
+import com.energym.energym_reservas.dto.request.EntrenadorRequestDTO;
+import com.energym.energym_reservas.dto.response.EntrenadorResponseDTO;
 import com.energym.energym_reservas.entity.Entrenador;
+import com.energym.energym_reservas.exception.ResourceNotFoundException;
+import com.energym.energym_reservas.mapper.EntrenadorMapper;
+import com.energym.energym_reservas.repository.ClaseRepository;
 import com.energym.energym_reservas.repository.EntrenadorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,89 +19,83 @@ import java.util.stream.Collectors;
 public class EntrenadorService {
     
     private final EntrenadorRepository entrenadorRepository;
-    
-    // CREATE
-    public EntrenadorDTO crearEntrenador(EntrenadorDTO entrenadorDTO) {
+    private final EntrenadorMapper entrenadorMapper;
+    private final ClaseRepository claseRepository;
+
+    /**
+     * Crear un nuevo entrenador
+     */
+    public EntrenadorResponseDTO crearEntrenador(EntrenadorRequestDTO request) {
         // Validar que no exista un entrenador con el mismo contacto
-        if (entrenadorRepository.findByContacto(entrenadorDTO.getContacto()).isPresent()) {
+        if (entrenadorRepository.findByContacto(request.getContacto()).isPresent()) {
             throw new RuntimeException("Ya existe un entrenador con ese contacto");
         }
         
-        Entrenador entrenador = Entrenador.builder()
-                .nombre(entrenadorDTO.getNombre())
-                .contacto(entrenadorDTO.getContacto())
-                .build();
-        
-        Entrenador entrenadorGuardado = entrenadorRepository.save(entrenador);
-        return convertirADTO(entrenadorGuardado);
+        Entrenador entrenador = entrenadorMapper.toEntity(request);
+        Entrenador savedEntrenador =  entrenadorRepository.save(entrenador);
+        return entrenadorMapper.toResponseDTO(savedEntrenador);
     }
     
-    // READ - Obtener todos los entrenadores
+    /*
+     * Obtener todos los entrenadores
+     */
+
     @Transactional(readOnly = true)
-    public List<EntrenadorDTO> obtenerTodosLosEntrenadores() {
-        return entrenadorRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<EntrenadorResponseDTO> obtenerTodosLosEntrenadores() {
+        List<Entrenador> entrenadores = entrenadorRepository.findAll();
+        return entrenadorMapper.toResponseList(entrenadores);
     }
     
-    // READ - Obtener entrenador por ID
+    /*
+     * Obtener entrenador por ID
+     */
     @Transactional(readOnly = true)
-    public EntrenadorDTO obtenerEntrenadorPorId(Integer id) {
+    public EntrenadorResponseDTO obtenerEntrenadorPorId(Integer id) {
         Entrenador entrenador = entrenadorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entrenador no encontrado con id: " + id));
-        return convertirADTO(entrenador);
+        return entrenadorMapper.toResponseDTO(entrenador);
     }
 
-    // READ - Buscar entrenadores por nombre
+    /*
+     * Buscar entrenadores por nombre
+     */
     @Transactional(readOnly = true)
-    public List<EntrenadorDTO> buscarEntrenadoresPorNombre(String nombre) {
-        return entrenadorRepository.findByNombreContainingIgnoreCase(nombre).stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<EntrenadorResponseDTO> buscarEntrenadoresPorNombre(String nombre) {
+        List<Entrenador>  entrenadores = entrenadorRepository.findByNombreContainingIgnoreCase(nombre);
+        return entrenadorMapper.toResponseList(entrenadores);
     }
     
-    // UPDATE - Actualizar entrenador
-    public EntrenadorDTO actualizarEntrenador(Integer id, EntrenadorDTO entrenadorDTO) {
+    /*
+     * Actualizar entrenador
+     */
+    public EntrenadorResponseDTO actualizarEntrenador(Integer id, EntrenadorRequestDTO request) {
         Entrenador entrenador = entrenadorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entrenador no encontrado con id: " + id));
         
         // Validar que el contacto no esté en uso por otro entrenador
-        if (entrenadorDTO.getContacto() != null && 
-            !entrenadorDTO.getContacto().equals(entrenador.getContacto())) {
-            entrenadorRepository.findByContacto(entrenadorDTO.getContacto())
-                    .ifPresent(e -> {
-                        if (!e.getId().equals(id)) {
-                            throw new RuntimeException("Ya existe un entrenador con ese contacto");
-                        }
-                    });
+        if (!entrenador.getContacto().equals(request.getContacto()) &&
+            entrenadorRepository.findByContacto(request.getContacto()).isPresent()) {
+                throw new RuntimeException("Ya existe un entrenador con ese contacto");
         }
-        
-        if (entrenadorDTO.getNombre() != null) {
-            entrenador.setNombre(entrenadorDTO.getNombre());
-        }
-        
-        if (entrenadorDTO.getContacto() != null) {
-            entrenador.setContacto(entrenadorDTO.getContacto());
-        }
-        
-        Entrenador entrenadorActualizado = entrenadorRepository.save(entrenador);
-        return convertirADTO(entrenadorActualizado);
+
+        entrenadorMapper.updateFromRequest(request, entrenador);
+        Entrenador savedEntrenador =  entrenadorRepository.save(entrenador);
+
+        return entrenadorMapper.toResponseDTO(savedEntrenador);
     }
     
-    // DELETE
+    /*
+     * Eliminar un Entrenador
+     */
     public void eliminarEntrenador(Integer id) {
         if (!entrenadorRepository.existsById(id)) {
-            throw new RuntimeException("Entrenador no encontrado con id: " + id);
+            throw new ResourceNotFoundException("Entrenador no encontrado con id: " + id);
+        }
+
+        boolean tieneClases = claseRepository.existsEntrenadorById(id);
+        if(tieneClases) {
+            throw new RuntimeException("No es posible eliminar un entrenador que cuenta con clases asignadas");
         }
         entrenadorRepository.deleteById(id);
-    }
-    
-    // Metodo auxiliar para convertir entidad a DTO
-    private EntrenadorDTO convertirADTO(Entrenador entrenador) {
-        return EntrenadorDTO.builder()
-                .id(entrenador.getId())
-                .nombre(entrenador.getNombre())
-                .contacto(entrenador.getContacto())
-                .build();
     }
 }
