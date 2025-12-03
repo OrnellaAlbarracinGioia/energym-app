@@ -2,6 +2,7 @@ package com.energym.energym_reservas.controller;
 
 import com.energym.energym_reservas.dto.request.ReservaRequestDTO;
 import com.energym.energym_reservas.dto.response.ReservaResponseDTO;
+import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.service.ReservaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -55,7 +56,7 @@ public class ReservaController {
     }
 
     @GetMapping("/estado/{estado}")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorEstado(@PathVariable("estado") String estado) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorEstado(@PathVariable("estado") Estado estado) {
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorEstado(estado);
         return ResponseEntity.ok(reservas);
     }

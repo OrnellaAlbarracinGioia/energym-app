@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 
@@ -35,10 +36,18 @@ public class GlobalExceptionHandler {
     "Ocurrió un error interno inesperado.", request);
     }
 
-    //404 Bad Request
+    //400 Bad Request
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorDTO> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         return construirRespuesta(HttpStatus.BAD_REQUEST, "Error de Validación", request);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorDTO> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        String nombreParametro = ex.getName();
+        String valorRechazado = ex.getValue() != null ? ex.getValue().toString() : "null";
+        String mensaje = "El parámetro " + nombreParametro + " tiene un valor incorrecto: " + valorRechazado;
+        return construirRespuesta(HttpStatus.BAD_REQUEST, mensaje, request);
     }
 
     private ResponseEntity<ApiErrorDTO> construirRespuesta(HttpStatus status, String message, HttpServletRequest request) {

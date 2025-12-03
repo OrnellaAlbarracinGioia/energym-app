@@ -122,8 +122,8 @@ public class ReservaService {
      * Obtener reservas por estado
      */
     @Transactional(readOnly = true)
-    public List<ReservaResponseDTO> obtenerReservasPorEstado(String estado) {
-        List<Reserva> reservas = reservaRepository.findByEstado(Estado.valueOf(estado.toUpperCase()));
+    public List<ReservaResponseDTO> obtenerReservasPorEstado(Estado estado) {
+        List<Reserva> reservas = reservaRepository.findByEstado(estado);
         return reservaMapper.toResponseList(reservas);
     }
 
