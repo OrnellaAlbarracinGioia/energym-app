@@ -20,77 +20,46 @@ import java.util.List;
 public class SucursalController {
     
     private final SucursalService sucursalService;
-    
-    // CREATE - Crear nueva sucursal
+
     @PostMapping
     public ResponseEntity<SucursalResponseDTO> crearSucursal(@Valid @RequestBody SucursalRequestDTO request) {
-        try {
-            SucursalResponseDTO sucursal = sucursalService.crearSucursal(request);
-            return new ResponseEntity<>(sucursal, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        SucursalResponseDTO sucursal = sucursalService.crearSucursal(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sucursal);
     }
-    
-    // READ - Obtener todas las sucursales
+
     @GetMapping
     public ResponseEntity<List<SucursalResponseDTO>> obtenerTodasLasSucursales() {
         List<SucursalResponseDTO> sucursales = sucursalService.obtenerTodasLasSucursales();
         return ResponseEntity.ok(sucursales);
     }
-    
-    // READ - Obtener sucursal por ID
+
     @GetMapping("/{id}")
     public ResponseEntity<SucursalResponseDTO> obtenerSucursalPorId(@PathVariable Integer id) {
-        try {
-            SucursalResponseDTO sucursal = sucursalService.obtenerSucursalPorId(id);
-            return ResponseEntity.ok(sucursal);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        SucursalResponseDTO sucursal = sucursalService.obtenerSucursalPorId(id);
+        return ResponseEntity.ok(sucursal);
     }
-    
-    /*
-     * Buscar sucursales por nombre
-     */
+
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorNombre(@RequestParam String nombre) {
         List<SucursalResponseDTO> sucursales = sucursalService.buscarSucursalesPorNombre(nombre);
         return ResponseEntity.ok(sucursales);
     }
-    
-    /*
-     * Buscar sucursales por dirección
-    */
+
     @GetMapping("/buscar/direccion")
     public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorDireccion(@RequestParam String direccion) {
         List<SucursalResponseDTO> sucursales = sucursalService.buscarSucursalesPorDireccion(direccion);
         return ResponseEntity.ok(sucursales);
     }
 
-    /*
-     * Actualizar sucursal
-    */
     @PutMapping("/{id}")
     public ResponseEntity<SucursalResponseDTO> actualizarSucursal(@PathVariable Integer id, @Valid @RequestBody SucursalRequestDTO request) {
-        try {
-            SucursalResponseDTO sucursal = sucursalService.actualizarSucursal(id, request);
-            return ResponseEntity.ok(sucursal);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        SucursalResponseDTO sucursal = sucursalService.actualizarSucursal(id, request);
+        return ResponseEntity.ok(sucursal);
     }
-    
-    /*
-     * Eliminar sucursal
-     */
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSucursal(@PathVariable Integer id) {
-        try {
-            sucursalService.eliminarSucursal(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        sucursalService.eliminarSucursal(id);
+        return ResponseEntity.noContent().build();
     }
 }
