@@ -7,7 +7,7 @@ import com.energym.energym_reservas.entity.Estado;
 import com.energym.energym_reservas.entity.Reserva;
 import com.energym.energym_reservas.entity.Socio;
 import com.energym.energym_reservas.event.ReservaCompletadaEvent;
-import com.energym.energym_reservas.exception.CapacidadLlenaException;
+import com.energym.energym_reservas.exception.BusinessRuleException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.mapper.ReservaMapper;
 import com.energym.energym_reservas.repository.ClaseRepository;
@@ -42,18 +42,18 @@ public class ReservaService {
     public ReservaResponseDTO crearReserva(ReservaRequestDTO request) {
 
         Socio socio = socioRepository.findById(request.getSocioId())
-                .orElseThrow(() -> new RuntimeException("Socio no encontrado con id: " + request.getSocioId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Socio", "id", request.getSocioId()));
 
         if(!socio.getActivo()) {
-            throw new IllegalStateException("Socio no se encuentra activo");
+            throw new BusinessRuleException("Socio no se encuentra activo");
         }
 
         Clase clase = claseRepository.findById(request.getClaseId())
-                .orElseThrow(() -> new RuntimeException("Clase no encontrada con id: " + request.getClaseId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Clase", "id", request.getClaseId()));
 
         LocalDateTime inicioClase = LocalDateTime.of(clase.getFecha(), clase.getHorario());
         if (inicioClase.isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("No se puede reservar una clase que ya pasó");
+            throw new BusinessRuleException("No se puede reservar una clase que ya pasó");
         }
 
         boolean yaReservado = reservaRepository.existsBySocioIdAndClaseIdAndEstado(
@@ -62,14 +62,13 @@ public class ReservaService {
                 Estado.CONFIRMADA);
 
         if (yaReservado) {
-            throw new IllegalStateException("El socio ya tiene una reserva confirmada en esta clase");
+            throw new BusinessRuleException("El socio ya tiene una reserva confirmada en esta clase");
         }
 
         Integer cuposDisponibles = verificarDisponibilidad(clase.getId());
 
         if(cuposDisponibles <= 0){
-            throw new CapacidadLlenaException(
-                    "La clase '" + clase.getActividad().getNombre() + "' está llena", clase.getActividad().getNombre(), cuposDisponibles);
+            throw new BusinessRuleException("La clase " + clase.getActividad().getNombre()  + " está llena");
         }
 
         Reserva reserva = Reserva.builder()
@@ -97,7 +96,7 @@ public class ReservaService {
     @Transactional(readOnly = true)
     public ReservaResponseDTO obtenerReservaPorId(Integer id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva", "id",id));
         return reservaMapper.toResponseDTO(reserva);
     }
 
@@ -133,16 +132,16 @@ public class ReservaService {
      */
     public ReservaResponseDTO cancelarReserva(Integer id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva", "id",id));
 
         if (!reserva.getEstado().equals(Estado.CONFIRMADA)) {
-            throw new RuntimeException("Solo se pueden cancelar reservas confirmadas");
+            throw new BusinessRuleException("Solo se pueden cancelar reservas confirmadas");
         }
 
         LocalDateTime inicioClase = LocalDateTime.of(reserva.getClase().getFecha(), reserva.getClase().getHorario());
 
         if(inicioClase.isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("No se pueden cancelar reservas que ya pasaron");
+            throw new BusinessRuleException("No se pueden cancelar reservas que ya pasaron");
         }
 
         if (Boolean.TRUE.equals(reserva.getClase().getPersonalizada())) {
@@ -162,16 +161,16 @@ public class ReservaService {
      */
     public ReservaResponseDTO marcarAsistencia(Integer reservaId) {
         Reserva reserva = reservaRepository.findById(reservaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva", "id",reservaId));
 
         LocalDateTime inicioClase = LocalDateTime.of(reserva.getClase().getFecha(), reserva.getClase().getHorario());
 
         if(inicioClase.isAfter(LocalDateTime.now())) {
-            throw new IllegalStateException("No se puede marcar asistencia antes de que la clase ocurra");
+            throw new BusinessRuleException("No se puede marcar asistencia antes de que la clase ocurra");
         }
 
         if(!reserva.getEstado().equals(Estado.CONFIRMADA)) {
-            throw new RuntimeException("La reserva no se encuentra confirmada o ya fue utilizada");
+            throw new BusinessRuleException("La reserva no se encuentra confirmada o ya fue utilizada");
         }
 
         reserva.setEstado(Estado.COMPLETADA);
@@ -205,7 +204,7 @@ public class ReservaService {
 
     private Integer verificarDisponibilidad(Integer claseId) {
         Clase clase = claseRepository.findById(claseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Clase no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Clase","id",claseId));
 
         Integer reservasConfirmadas = reservaRepository.countByClaseIdAndEstado(claseId, Estado.CONFIRMADA);
         Integer capacidadMaxima = clase.getCapacidadMaxima();
