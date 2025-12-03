@@ -1,6 +1,7 @@
 package com.energym.energym_reservas.controller;
 
-import com.energym.energym_reservas.dto.SucursalDTO;
+import com.energym.energym_reservas.dto.request.SucursalRequestDTO;
+import com.energym.energym_reservas.dto.response.SucursalResponseDTO;
 import com.energym.energym_reservas.service.SucursalService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,9 +23,9 @@ public class SucursalController {
     
     // CREATE - Crear nueva sucursal
     @PostMapping
-    public ResponseEntity<SucursalDTO> crearSucursal(@Valid @RequestBody SucursalDTO sucursalDTO) {
+    public ResponseEntity<SucursalResponseDTO> crearSucursal(@Valid @RequestBody SucursalRequestDTO request) {
         try {
-            SucursalDTO sucursal = sucursalService.crearSucursal(sucursalDTO);
+            SucursalResponseDTO sucursal = sucursalService.crearSucursal(request);
             return new ResponseEntity<>(sucursal, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -33,50 +34,56 @@ public class SucursalController {
     
     // READ - Obtener todas las sucursales
     @GetMapping
-    public ResponseEntity<List<SucursalDTO>> obtenerTodasLasSucursales() {
-        List<SucursalDTO> sucursales = sucursalService.obtenerTodasLasSucursales();
+    public ResponseEntity<List<SucursalResponseDTO>> obtenerTodasLasSucursales() {
+        List<SucursalResponseDTO> sucursales = sucursalService.obtenerTodasLasSucursales();
         return ResponseEntity.ok(sucursales);
     }
     
     // READ - Obtener sucursal por ID
     @GetMapping("/{id}")
-    public ResponseEntity<SucursalDTO> obtenerSucursalPorId(@PathVariable Integer id) {
+    public ResponseEntity<SucursalResponseDTO> obtenerSucursalPorId(@PathVariable Integer id) {
         try {
-            SucursalDTO sucursal = sucursalService.obtenerSucursalPorId(id);
+            SucursalResponseDTO sucursal = sucursalService.obtenerSucursalPorId(id);
             return ResponseEntity.ok(sucursal);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
     
-    /* READ - Buscar sucursales por nombre
+    /*
+     * Buscar sucursales por nombre
+     */
     @GetMapping("/buscar/nombre")
-    public ResponseEntity<List<SucursalDTO>> buscarSucursalesPorNombre(@RequestParam String nombre) {
-        List<SucursalDTO> sucursales = sucursalService.buscarSucursalesPorNombre(nombre);
+    public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorNombre(@RequestParam String nombre) {
+        List<SucursalResponseDTO> sucursales = sucursalService.buscarSucursalesPorNombre(nombre);
         return ResponseEntity.ok(sucursales);
-    }*/
+    }
     
-    /* READ - Buscar sucursales por dirección
+    /*
+     * Buscar sucursales por dirección
+    */
     @GetMapping("/buscar/direccion")
-    public ResponseEntity<List<SucursalDTO>> buscarSucursalesPorDireccion(@RequestParam String direccion) {
-        List<SucursalDTO> sucursales = sucursalService.buscarSucursalesPorDireccion(direccion);
+    public ResponseEntity<List<SucursalResponseDTO>> buscarSucursalesPorDireccion(@RequestParam String direccion) {
+        List<SucursalResponseDTO> sucursales = sucursalService.buscarSucursalesPorDireccion(direccion);
         return ResponseEntity.ok(sucursales);
-    }*/
-    
-    /* UPDATE - Actualizar sucursal
+    }
+
+    /*
+     * Actualizar sucursal
+    */
     @PutMapping("/{id}")
-    public ResponseEntity<SucursalDTO> actualizarSucursal(
-            @PathVariable Integer id, 
-            @Valid @RequestBody SucursalDTO sucursalDTO) {
+    public ResponseEntity<SucursalResponseDTO> actualizarSucursal(@PathVariable Integer id, @Valid @RequestBody SucursalRequestDTO request) {
         try {
-            SucursalDTO sucursal = sucursalService.actualizarSucursal(id, sucursalDTO);
+            SucursalResponseDTO sucursal = sucursalService.actualizarSucursal(id, request);
             return ResponseEntity.ok(sucursal);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    }*/
+    }
     
-    // DELETE - Eliminar sucursal
+    /*
+     * Eliminar sucursal
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSucursal(@PathVariable Integer id) {
         try {

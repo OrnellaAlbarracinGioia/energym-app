@@ -1,14 +1,16 @@
 package com.energym.energym_reservas.service;
 
-import com.energym.energym_reservas.dto.SucursalDTO;
+import com.energym.energym_reservas.dto.request.SucursalRequestDTO;
+import com.energym.energym_reservas.dto.response.SucursalResponseDTO;
 import com.energym.energym_reservas.entity.Sucursal;
+import com.energym.energym_reservas.mapper.SucursalMapper;
+import com.energym.energym_reservas.repository.ClaseRepository;
 import com.energym.energym_reservas.repository.SucursalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,97 +18,95 @@ import java.util.stream.Collectors;
 public class SucursalService {
     
     private final SucursalRepository sucursalRepository;
+    private final SucursalMapper sucursalMapper;
+    private final ClaseRepository claseRepository;
     
-    // CREATE
-    public SucursalDTO crearSucursal(SucursalDTO sucursalDTO) {
+    /*
+     * Crear una nueva Sucursal
+     */
+
+    public SucursalResponseDTO crearSucursal(SucursalRequestDTO request) {
         // Validar que no exista una sucursal con el mismo nombre
-        if (sucursalRepository.findByNombre(sucursalDTO.getNombre()).isPresent()) {
+        if (sucursalRepository.findByNombre(request.getNombre()).isPresent()) {
             throw new RuntimeException("Ya existe una sucursal con ese nombre");
         }
         
-        Sucursal sucursal = Sucursal.builder()
-                .nombre(sucursalDTO.getNombre())
-                .direccion(sucursalDTO.getDireccion())
-                .build();
-        
-        Sucursal sucursalGuardada = sucursalRepository.save(sucursal);
-        return convertirADTO(sucursalGuardada);
+        Sucursal sucursal = sucursalMapper.toEntity(request);
+        Sucursal savedSucursal = sucursalRepository.save(sucursal);
+        return sucursalMapper.toResponseDTO(savedSucursal);
     }
     
-    // READ - Obtener todas las sucursales
+    /*
+     * Obtener todas las Sucursales
+     */
     @Transactional(readOnly = true)
-    public List<SucursalDTO> obtenerTodasLasSucursales() {
-        return sucursalRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<SucursalResponseDTO> obtenerTodasLasSucursales() {
+        List<Sucursal> sucursales = sucursalRepository.findAll();
+        return sucursalMapper.toResponseList(sucursales);
     }
     
-    // READ - Obtener sucursal por ID
+    /*
+     * Obtener sucursal por ID
+     */
     @Transactional(readOnly = true)
-    public SucursalDTO obtenerSucursalPorId(Integer id) {
+    public SucursalResponseDTO obtenerSucursalPorId(Integer id) {
         Sucursal sucursal = sucursalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sucursal no encontrada con id: " + id));
-        return convertirADTO(sucursal);
+        return sucursalMapper.toResponseDTO(sucursal);
     }
     
-    // READ - Buscar sucursales por nombre
+    /*
+     * Buscar sucursales por nombre
+     */
     @Transactional(readOnly = true)
-    public List<SucursalDTO> buscarSucursalesPorNombre(String nombre) {
-        return sucursalRepository.findByNombreContainingIgnoreCase(nombre).stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<SucursalResponseDTO> buscarSucursalesPorNombre(String nombre) {
+        List<Sucursal> sucursales = sucursalRepository.findByNombreContainingIgnoreCase(nombre);
+        return sucursalMapper.toResponseList(sucursales);
     }
     
-    // READ - Buscar sucursales por dirección
+    /*
+     * Buscar sucursales por dirección
+     */
     @Transactional(readOnly = true)
-    public List<SucursalDTO> buscarSucursalesPorDireccion(String direccion) {
-        return sucursalRepository.findByDireccionContainingIgnoreCase(direccion).stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<SucursalResponseDTO> buscarSucursalesPorDireccion(String direccion) {
+        List<Sucursal> sucursales = sucursalRepository.findByDireccionContainingIgnoreCase(direccion);
+        return sucursalMapper.toResponseList(sucursales);
     }
     
-    // UPDATE - Actualizar sucursal
-    public SucursalDTO actualizarSucursal(Integer id, SucursalDTO sucursalDTO) {
+    /*
+     * Actualizar sucursal
+     */
+    public SucursalResponseDTO actualizarSucursal(Integer id, SucursalRequestDTO request) {
         Sucursal sucursal = sucursalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sucursal no encontrada con id: " + id));
         
         // Validar que el nombre no esté en uso por otra sucursal
-        if (sucursalDTO.getNombre() != null && 
-            !sucursalDTO.getNombre().equals(sucursal.getNombre())) {
-            sucursalRepository.findByNombre(sucursalDTO.getNombre())
-                    .ifPresent(s -> {
-                        if (!s.getId().equals(id)) {
-                            throw new RuntimeException("Ya existe una sucursal con ese nombre");
-                        }
-                    });
+        if (!sucursal.getNombre().equals(request.getNombre()) &&
+            sucursalRepository.findByNombre(request.getNombre()).isPresent()) {
+            throw new RuntimeException("Ya existe una sucursal con ese nombre");
+
         }
-        
-        if (sucursalDTO.getNombre() != null) {
-            sucursal.setNombre(sucursalDTO.getNombre());
-        }
-        
-        if (sucursalDTO.getDireccion() != null) {
-            sucursal.setDireccion(sucursalDTO.getDireccion());
-        }
-        
-        Sucursal sucursalActualizada = sucursalRepository.save(sucursal);
-        return convertirADTO(sucursalActualizada);
+
+        sucursalMapper.updateFromRequest(request, sucursal);
+        Sucursal savedSucursal = sucursalRepository.save(sucursal);
+
+        return sucursalMapper.toResponseDTO(savedSucursal);
     }
     
-    // DELETE
+    /*
+     * Eliminar Sucursal
+     */
     public void eliminarSucursal(Integer id) {
         if (!sucursalRepository.existsById(id)) {
             throw new RuntimeException("Sucursal no encontrada con id: " + id);
         }
+
+        boolean tieneClases = claseRepository.existsBySucursalId(id);
+
+        if (tieneClases) {
+            throw new RuntimeException("No es posible eliminar la sucursal porque tiene clases asociadas.");
+        }
         sucursalRepository.deleteById(id);
     }
-    
-    // Metodo auxiliar para convertir entidad a DTO
-    private SucursalDTO convertirADTO(Sucursal sucursal) {
-        return SucursalDTO.builder()
-                .id(sucursal.getId())
-                .nombre(sucursal.getNombre())
-                .direccion(sucursal.getDireccion())
-                .build();
-    }
+
 }
