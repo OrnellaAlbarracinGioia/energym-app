@@ -7,6 +7,7 @@ import com.energym.energym_reservas.entity.Actividad;
 import com.energym.energym_reservas.entity.Clase;
 import com.energym.energym_reservas.entity.Entrenador;
 import com.energym.energym_reservas.entity.Sucursal;
+import com.energym.energym_reservas.exception.BusinessRuleException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.mapper.ClaseMapper;
 import com.energym.energym_reservas.repository.*;
@@ -36,16 +37,16 @@ public class ClaseService {
 
         // Validar que la actividad existe
         Actividad actividad = actividadRepository.findById(request.getActividadId())
-                .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad", "id", request.getActividadId()));
 
         // Validar que la sucursal existe
         Sucursal sucursal = sucursalRepository.findById(request.getSucursalId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sucursal no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sucursal", "id", request.getSucursalId()));
 
         List<Clase> clasesACrear = new ArrayList<>();
         for (ClaseScheduleRequestDTO claseSchedule : request.getClases()) {
             Entrenador entrenador = entrenadorRepository.findById(claseSchedule.getEntrenadorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Entrenador no encontrado"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Entrenador", "id", claseSchedule.getEntrenadorId()));
 
             Clase clase = claseMapper.toEntity(claseSchedule);
             clase.setActividad(actividad);
@@ -72,7 +73,7 @@ public class ClaseService {
     @Transactional(readOnly = true)
     public ClaseResponseDTO obtenerClasePorId(Integer id) {
         Clase clase = claseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Clase no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Clase", "id", id));
         return claseMapper.toResponseDTO(clase);
     }
 
@@ -81,12 +82,12 @@ public class ClaseService {
      */
     public void eliminarClase(Integer id) {
         if(!claseRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Clase no encontrada");
+            throw new ResourceNotFoundException("Clase", "id", id);
         }
 
         boolean tieneReservas = reservaRepository.existsByClaseId(id);
         if(tieneReservas) {
-            throw new RuntimeException("Una clase no puede ser eliminada ya que contiene reservas activas");
+            throw new BusinessRuleException("Una clase no puede ser eliminada ya que contiene reservas activas");
         }
 
         claseRepository.deleteById(id);

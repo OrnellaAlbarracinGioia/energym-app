@@ -30,7 +30,7 @@ public class ClaseController {
 
     @PostMapping
     @Operation(summary = "Crear clases asociadas a una Actividad", description = "Crea en el sistema clases")
-    public ResponseEntity<List<ClaseResponseDTO>> createClases(@Valid @RequestBody ClasesBatchCreateRequestDTO request) {
+    public ResponseEntity<List<ClaseResponseDTO>> crearClases(@Valid @RequestBody ClasesBatchCreateRequestDTO request) {
         List<ClaseResponseDTO> clasesCreadas = claseService.crearClases(request);
         return ResponseEntity.ok().body(clasesCreadas);
     }
