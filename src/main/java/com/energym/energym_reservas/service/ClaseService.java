@@ -1,25 +1,21 @@
 package com.energym.energym_reservas.service;
 
-import com.energym.energym_reservas.dto.ClaseDTO;
-import com.energym.energym_reservas.dto.ClasesCreateDTO;
-import com.energym.energym_reservas.dto.ClasesCreateRequestDTO;
-import com.energym.energym_reservas.dto.ReservaDTO;
+import com.energym.energym_reservas.dto.request.ClaseScheduleRequestDTO;
+import com.energym.energym_reservas.dto.request.ClasesBatchCreateRequestDTO;
+import com.energym.energym_reservas.dto.response.ClaseResponseDTO;
 import com.energym.energym_reservas.entity.Actividad;
 import com.energym.energym_reservas.entity.Clase;
 import com.energym.energym_reservas.entity.Entrenador;
 import com.energym.energym_reservas.entity.Sucursal;
-import com.energym.energym_reservas.repository.ActividadRepository;
-import com.energym.energym_reservas.repository.ClaseRepository;
-import com.energym.energym_reservas.repository.EntrenadorRepository;
-import com.energym.energym_reservas.repository.SucursalRepository;
-import jakarta.validation.Valid;
+import com.energym.energym_reservas.exception.ResourceNotFoundException;
+import com.energym.energym_reservas.mapper.ClaseMapper;
+import com.energym.energym_reservas.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -29,57 +25,70 @@ public class ClaseService {
     private final ClaseRepository claseRepository;
     private final ActividadRepository actividadRepository;
     private final EntrenadorRepository entrenadorRepository;
+    private final ReservaRepository reservaRepository;
     private final SucursalRepository sucursalRepository;
+    private final ClaseMapper claseMapper;
 
-
-    public List<ClaseDTO> createClases(ClasesCreateRequestDTO clasesCreateRequestDTO) {
+    /*
+     * Crear una o muchas clases
+     */
+    public List<ClaseResponseDTO> crearClases(ClasesBatchCreateRequestDTO request) {
 
         // Validar que la actividad existe
-        Actividad actividad = actividadRepository.findById(clasesCreateRequestDTO.getActividadId())
-                .orElseThrow(() -> new RuntimeException("Actividad no encontrada"));
+        Actividad actividad = actividadRepository.findById(request.getActividadId())
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada"));
 
         // Validar que la sucursal existe
-        Sucursal sucursal = sucursalRepository.findById(clasesCreateRequestDTO.getSucursalId())
-                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+        Sucursal sucursal = sucursalRepository.findById(request.getSucursalId())
+                .orElseThrow(() -> new ResourceNotFoundException("Sucursal no encontrada"));
 
-        List<ClasesCreateDTO> clasesCreateDTO = clasesCreateRequestDTO.getClases();
+        List<Clase> clasesACrear = new ArrayList<>();
+        for (ClaseScheduleRequestDTO claseSchedule : request.getClases()) {
+            Entrenador entrenador = entrenadorRepository.findById(claseSchedule.getEntrenadorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Entrenador no encontrado"));
 
-        List<ClaseDTO> clasesDTO = new ArrayList<>();
-        for (ClasesCreateDTO c : clasesCreateDTO) {
-            Entrenador entrenador = entrenadorRepository.findById(c.getEntrenadorId())
-                    .orElseThrow(() -> new RuntimeException("Entrenador no encontrado"));
-
-            Clase clase = Clase.builder()
-                    .actividad(actividad)
-                    .sucursal(sucursal)
-                    .entrenador(entrenador)
-                    .fecha(c.getFecha())
-                    .horario(c.getHorario())
-                    .capacidadMaxima(c.getCapacidadMaxima())
-                    .build();
-            Clase claseGuardada = claseRepository.save(clase);
-            ClaseDTO claseDTO = convertirADTO(claseGuardada);
-            clasesDTO.add(claseDTO);
+            Clase clase = claseMapper.toEntity(claseSchedule);
+            clase.setActividad(actividad);
+            clase.setSucursal(sucursal);
+            clase.setEntrenador(entrenador);
+            clasesACrear.add(clase);
         }
-        return clasesDTO;
+        List<Clase> savedClases = claseRepository.saveAll(clasesACrear);
+        return claseMapper.toResponseList(savedClases);
     }
 
+    /*
+     * Obtener todas las Clases
+     */
     @Transactional(readOnly = true)
-    public List<ClaseDTO> obtenerClases() {
-        return claseRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<ClaseResponseDTO> obtenerClases() {
+        List<Clase> clases = claseRepository.findAll();
+        return claseMapper.toResponseList(clases);
     }
 
-    private ClaseDTO convertirADTO(Clase clase) {
-        return ClaseDTO.builder()
-                .id(clase.getId())
-                .actividadId(clase.getActividad().getId())
-                .sucursalId(clase.getSucursal().getId())
-                .entrenadorId(clase.getEntrenador().getId())
-                .fecha(clase.getFecha())
-                .capacidadMaxima(clase.getCapacidadMaxima())
-                .horario(clase.getHorario())
-                .build();
+    /*
+     * Obtener clase por ID
+     */
+    @Transactional(readOnly = true)
+    public ClaseResponseDTO obtenerClasePorId(Integer id) {
+        Clase clase = claseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Clase no encontrada"));
+        return claseMapper.toResponseDTO(clase);
+    }
+
+    /*
+     * Eliminar clase por ID
+     */
+    public void eliminarClase(Integer id) {
+        if(!claseRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Clase no encontrada");
+        }
+
+        boolean tieneReservas = reservaRepository.existsByClaseId(id);
+        if(tieneReservas) {
+            throw new RuntimeException("Una clase no puede ser eliminada ya que contiene reservas activas");
+        }
+
+        claseRepository.deleteById(id);
     }
 }

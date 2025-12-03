@@ -1,8 +1,7 @@
 package com.energym.energym_reservas.controller;
 
-import com.energym.energym_reservas.dto.ActividadDTO;
-import com.energym.energym_reservas.dto.ClaseDTO;
-import com.energym.energym_reservas.dto.ClasesCreateRequestDTO;
+import com.energym.energym_reservas.dto.request.ClasesBatchCreateRequestDTO;
+import com.energym.energym_reservas.dto.response.ClaseResponseDTO;
 import com.energym.energym_reservas.service.ClaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,14 +23,15 @@ public class ClaseController {
 
     @GetMapping
     @Operation(summary = "Obtener las clases existentes en sistema", description = "Lista las clases")
-    public ResponseEntity<List<ClaseDTO>> obtenerClases() {
-        List<ClaseDTO> clases = claseService.obtenerClases();
+    public ResponseEntity<List<ClaseResponseDTO>> obtenerClases() {
+        List<ClaseResponseDTO> clases = claseService.obtenerClases();
         return ResponseEntity.ok(clases);
     }
+
     @PostMapping
     @Operation(summary = "Crear clases asociadas a una Actividad", description = "Crea en el sistema clases")
-    public ResponseEntity<List<ClaseDTO>> createClases(@Valid @RequestBody ClasesCreateRequestDTO clasesCreateRequestDTO) {
-        List<ClaseDTO> clasesCreadas = claseService.createClases(clasesCreateRequestDTO);
+    public ResponseEntity<List<ClaseResponseDTO>> createClases(@Valid @RequestBody ClasesBatchCreateRequestDTO request) {
+        List<ClaseResponseDTO> clasesCreadas = claseService.crearClases(request);
         return ResponseEntity.ok().body(clasesCreadas);
     }
 }

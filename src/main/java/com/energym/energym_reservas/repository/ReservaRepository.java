@@ -30,4 +30,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     List<Reserva> findBySocioIdAndEstado(Integer socioId, Estado estado);
 
     boolean existsBySocioId(Integer id);
+
+    boolean existsByClaseId(Integer id);
 }
