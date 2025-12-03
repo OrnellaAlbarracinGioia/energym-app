@@ -26,13 +26,12 @@ public class ClaseScheduleRequestDTO {
     private Integer capacidadMaxima;
 
     @NotNull(message = "La fecha es requerida")
-    @Schema(example = "2025-11-01", description = "Fecha de la clase en formato yyyy-MM-dd")
+    @Schema(type = "string", example = "2025-11-01", description = "Fecha de la clase en formato yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fecha;
 
     @NotNull(message = "La hora es requerida")
-    @Schema(example = "09:30", description = "Hora de inicio de la clase en formato HH:mm")
+    @Schema(type = "string", example = "09:30", description = "Hora de inicio de la clase en formato HH:mm")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horario;
-
 }
