@@ -1,6 +1,5 @@
 package com.energym.energym_reservas.listener;
-
-import com.energym.energym_reservas.dto.ReservaDTO;
+import com.energym.energym_reservas.dto.response.ReservaResponseDTO;
 import com.energym.energym_reservas.event.ReservaCompletadaEvent;
 import com.energym.energym_reservas.service.ReservaService;
 import com.energym.energym_reservas.service.SocioService;
@@ -19,7 +18,7 @@ public class SocioEventListener {
     @EventListener
     public void handleReservaCompletada(ReservaCompletadaEvent event) {
 
-        ReservaDTO reserva = reservaService.obtenerReservaPorId(event.getIdReserva());
+        ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(event.getIdReserva());
 
         Integer idSocio = reserva.getSocioId();
 

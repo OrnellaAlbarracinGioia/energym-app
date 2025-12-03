@@ -1,6 +1,7 @@
 package com.energym.energym_reservas.controller;
 
-import com.energym.energym_reservas.dto.ReservaDTO;
+import com.energym.energym_reservas.dto.request.ReservaRequestDTO;
+import com.energym.energym_reservas.dto.response.ReservaResponseDTO;
 import com.energym.energym_reservas.service.ReservaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,9 +23,9 @@ public class ReservaController {
     private final ReservaService reservaService;
 
     @PostMapping
-    public ResponseEntity<ReservaDTO> crearReserva(@Valid @RequestBody ReservaDTO reservaDTO) {
+    public ResponseEntity<ReservaResponseDTO> crearReserva(@Valid @RequestBody ReservaRequestDTO request) {
         try {
-            ReservaDTO reserva = reservaService.crearReserva(reservaDTO);
+            ReservaResponseDTO reserva = reservaService.crearReserva(request);
             log.info("Reserva creada");
             return new ResponseEntity<>(reserva, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -34,9 +35,9 @@ public class ReservaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservaDTO>> obtenerTodasLasReservas() {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerTodasLasReservas() {
         try {
-            List<ReservaDTO> reservas = reservaService.obtenerTodasLasReservas();
+            List<ReservaResponseDTO> reservas = reservaService.obtenerTodasLasReservas();
             return ResponseEntity.ok(reservas);
         } catch (Exception e) {
             log.error(" Error al obtener reservas: {}", e.getMessage());
@@ -44,22 +45,22 @@ public class ReservaController {
         }
     }
 
-/*
+
     @GetMapping("/{id}")
-    public ResponseEntity<ReservaDTO> obtenerReservaPorId(@PathVariable Integer id) {
+    public ResponseEntity<ReservaResponseDTO> obtenerReservaPorId(@PathVariable Integer id) {
         try {
-            ReservaDTO reserva = reservaService.obtenerReservaPorId(id);
+            ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(id);
             return ResponseEntity.ok(reserva);
         } catch (Exception e) {
             log.error(" Error al obtener reserva: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-    }*/
+    }
 
     @GetMapping("/socio/{socioId}")
-    public ResponseEntity<List<ReservaDTO>> obtenerReservasPorSocio(@PathVariable Integer socioId) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorSocio(@PathVariable Integer socioId) {
         try {
-            List<ReservaDTO> reservas = reservaService.obtenerReservasPorSocio(socioId);
+            List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorSocio(socioId);
             return ResponseEntity.ok(reservas);
         } catch (Exception e) {
             log.error(" Error al obtener reservas por socio: {}", e.getMessage());
@@ -69,9 +70,9 @@ public class ReservaController {
 
 
     @GetMapping("/clase/{claseId}")
-    public ResponseEntity<List<ReservaDTO>> obtenerReservasPorClase(@PathVariable Integer claseId) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorClase(@PathVariable Integer claseId) {
         try {
-            List<ReservaDTO> reservas = reservaService.obtenerReservasPorClase(claseId);
+            List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorClase(claseId);
             return ResponseEntity.ok(reservas);
         } catch (Exception e) {
             log.error(" Error al obtener reservas por clase: {}", e.getMessage());
@@ -80,9 +81,9 @@ public class ReservaController {
     }
 
     @GetMapping("/estado/{estado}")
-    public ResponseEntity<List<ReservaDTO>> obtenerReservasPorEstado(@PathVariable String estado) {
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorEstado(@PathVariable String estado) {
         try {
-            List<ReservaDTO> reservas = reservaService.obtenerReservasPorEstado(estado);
+            List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorEstado(estado);
             return ResponseEntity.ok(reservas);
         } catch (Exception e) {
             log.error(" Error al obtener reservas por estado: {}", e.getMessage());
@@ -90,48 +91,22 @@ public class ReservaController {
         }
     }
 
-/*    @PutMapping("/{id}")
-    public ResponseEntity<ReservaDTO> actualizarReserva(
-            @PathVariable Integer id,
-            @Valid @RequestBody ReservaDTO reservaDTO) {
-        try {
-            ReservaDTO reserva = reservaService.actualizarReserva(id, reservaDTO);
-            log.info(" Reserva {} actualizada", id);
-            return ResponseEntity.ok(reserva);
-        } catch (Exception e) {
-            log.error(" Error al actualizar reserva: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }*/
 
     @PatchMapping("/{id}/marcar-asistencia")
-    public ResponseEntity<ReservaDTO> marcarAsistencia(
-            @PathVariable Integer id) {
-        ReservaDTO reserva = reservaService.marcarAsistencia(id);
+    public ResponseEntity<ReservaResponseDTO> marcarAsistencia(@PathVariable Integer id) {
+        ReservaResponseDTO reserva = reservaService.marcarAsistencia(id);
         return ResponseEntity.ok(reserva);
     }
 
     @PatchMapping("/{id}/cancelar")
-    public ResponseEntity<ReservaDTO> cancelarReserva(@PathVariable Integer id) {
+    public ResponseEntity<ReservaResponseDTO> cancelarReserva(@PathVariable Integer id) {
         try {
-            ReservaDTO reserva = reservaService.cancelarReserva(id);
+            ReservaResponseDTO reserva = reservaService.cancelarReserva(id);
             log.info(" Reserva {} cancelada", id);
             return ResponseEntity.ok(reserva);
         } catch (Exception e) {
             log.error(" Error al cancelar reserva: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarReserva(@PathVariable Integer id) {
-        try {
-            reservaService.eliminarReserva(id);
-            log.info(" Reserva {} eliminada", id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            log.error(" Error al eliminar reserva: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
