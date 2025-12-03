@@ -27,7 +27,7 @@ public class SucursalService {
 
     public SucursalResponseDTO crearSucursal(SucursalRequestDTO request) {
         // Validar que no exista una sucursal con el mismo nombre
-        if (sucursalRepository.findByNombre(request.getNombre()).isPresent()) {
+        if (sucursalRepository.findByNombreIgnoreCase(request.getNombre()).isPresent()) {
             throw new RuntimeException("Ya existe una sucursal con ese nombre");
         }
         
@@ -82,7 +82,7 @@ public class SucursalService {
         
         // Validar que el nombre no esté en uso por otra sucursal
         if (!sucursal.getNombre().equals(request.getNombre()) &&
-            sucursalRepository.findByNombre(request.getNombre()).isPresent()) {
+            sucursalRepository.findByNombreIgnoreCase(request.getNombre()).isPresent()) {
             throw new RuntimeException("Ya existe una sucursal con ese nombre");
 
         }
