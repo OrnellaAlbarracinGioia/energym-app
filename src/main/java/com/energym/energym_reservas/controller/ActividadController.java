@@ -1,6 +1,7 @@
 package com.energym.energym_reservas.controller;
 
-import com.energym.energym_reservas.dto.ActividadDTO;
+import com.energym.energym_reservas.dto.request.ActividadRequestDTO;
+import com.energym.energym_reservas.dto.response.ActividadResponseDTO;
 import com.energym.energym_reservas.service.ActividadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,8 +26,8 @@ public class ActividadController {
      */
     @GetMapping
     @Operation(summary = "Obtener todas las actividades", description = "Retorna una lista de todas las actividades disponibles")
-    public ResponseEntity<List<ActividadDTO>> getAllActividades() {
-        List<ActividadDTO> actividades = actividadService.getAllActividades();
+    public ResponseEntity<List<ActividadResponseDTO>> obtenerTodasActividades() {
+        List<ActividadResponseDTO> actividades = actividadService.obtenerTodasActividades();
         return ResponseEntity.ok(actividades);
     }
 
@@ -35,8 +36,8 @@ public class ActividadController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Obtener actividad por ID", description = "Retorna los detalles de una actividad específica")
-    public ResponseEntity<ActividadDTO> getActividadById(@PathVariable Integer id) {
-        ActividadDTO actividad = actividadService.getActividadById(id);
+    public ResponseEntity<ActividadResponseDTO> obtenerActividadPorId(@PathVariable Integer id) {
+        ActividadResponseDTO actividad = actividadService.obtenerActividadPorId(id);
         return ResponseEntity.ok(actividad);
     }
 
@@ -45,8 +46,8 @@ public class ActividadController {
      */
     @PostMapping
     @Operation(summary = "Crear nueva actividad", description = "Crea una nueva actividad en el sistema")
-    public ResponseEntity<ActividadDTO> createActividad( @Valid @RequestBody ActividadDTO actividadDTO) {
-        ActividadDTO nuevaActividad = actividadService.createActividad(actividadDTO);
+    public ResponseEntity<ActividadResponseDTO> crearActividad( @Valid @RequestBody ActividadRequestDTO request) {
+        ActividadResponseDTO nuevaActividad = actividadService.crearActividad(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaActividad);
     }
 
@@ -55,9 +56,8 @@ public class ActividadController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar actividad", description = "Actualiza los datos de una actividad existente")
-    public ResponseEntity<ActividadDTO> updateActividad(@PathVariable Integer id,
-                                                    @Valid @RequestBody ActividadDTO actividadDTO) {
-        ActividadDTO actividadActualizada = actividadService.updateActividad(id, actividadDTO);
+    public ResponseEntity<ActividadResponseDTO> actualizarActividad(@PathVariable Integer id, @Valid @RequestBody ActividadRequestDTO request) {
+        ActividadResponseDTO actividadActualizada = actividadService.actualizarActividad(id, request);
         return ResponseEntity.ok(actividadActualizada);
     }
 
@@ -66,8 +66,8 @@ public class ActividadController {
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar actividad", description = "Elimina una actividad del sistema")
-    public ResponseEntity<Void> deleteActividad(@PathVariable Integer id) {
-        actividadService.deleteActividad(id);
+    public ResponseEntity<Void> eliminarActividad(@PathVariable Integer id) {
+        actividadService.eliminarActividad(id);
         return ResponseEntity.noContent().build();
     }
 

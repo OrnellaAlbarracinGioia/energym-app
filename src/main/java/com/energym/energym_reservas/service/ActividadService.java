@@ -1,17 +1,17 @@
 package com.energym.energym_reservas.service;
 
-import com.energym.energym_reservas.dto.ActividadDTO;
+import com.energym.energym_reservas.dto.request.ActividadRequestDTO;
+import com.energym.energym_reservas.dto.response.ActividadResponseDTO;
 import com.energym.energym_reservas.entity.Actividad;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
+import com.energym.energym_reservas.mapper.ActividadMapper;
 import com.energym.energym_reservas.repository.ActividadRepository;
-import com.energym.energym_reservas.repository.EntrenadorRepository;
-import com.energym.energym_reservas.repository.SucursalRepository;
+import com.energym.energym_reservas.repository.ClaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,81 +19,73 @@ import java.util.stream.Collectors;
 public class ActividadService {
 
     private final ActividadRepository actividadRepository;
+    private final ActividadMapper actividadMapper;
+    private final ClaseRepository claseRepository;
 
     /**
      * Obtener todas las actividades
      */
     @Transactional(readOnly = true)
-    public List<ActividadDTO> getAllActividades() {
-        return actividadRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<ActividadResponseDTO> obtenerTodasActividades() {
+        List<Actividad> actividades = actividadRepository.findAll();
+        return actividadMapper.toResponseList(actividades);
     }
 
     /**
      * Obtener una actividad por ID
      */
     @Transactional(readOnly = true)
-    public ActividadDTO getActividadById(Integer id) {
-
+    public ActividadResponseDTO obtenerActividadPorId(Integer id) {
         Actividad actividad = actividadRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
-        return convertirADTO(actividad);
+
+        return actividadMapper.toResponseDTO(actividad);
     }
 
     /**
      * Crear una nueva actividad
      */
-    public ActividadDTO createActividad(ActividadDTO actividadDTO) {
+    public ActividadResponseDTO crearActividad(ActividadRequestDTO request) {
 
-        // Crear la entidad
-        Actividad actividad = Actividad.builder()
-                .nombre(actividadDTO.getNombre())
-                .descripcion(actividadDTO.getDescripcion())
-                .duracionMinutos(actividadDTO.getDuracionMinutos())
-                .build();
+        if(actividadRepository.findByNombreIgnoreCase(request.getNombre()).isPresent()){
+            throw new RuntimeException("Ya existe una actividad con ese nombre");
+        }
 
+        Actividad actividad = actividadMapper.toEntity(request);
         Actividad savedActividad = actividadRepository.save(actividad);
-        return convertirADTO(savedActividad);
+        return actividadMapper.toResponseDTO(savedActividad);
     }
 
     /**
      * Actualizar una actividad existente
      */
-    public ActividadDTO updateActividad(Integer id, ActividadDTO actividadDTO) {
+    public ActividadResponseDTO actualizarActividad(Integer id, ActividadRequestDTO request) {
         Actividad actividad = actividadRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
 
-        // Actualizar campos básicos
-        actividad.setNombre(actividadDTO.getNombre());
+        if(!actividad.getNombre().equalsIgnoreCase(request.getNombre()) &&
+            actividadRepository.findByNombreIgnoreCase(request.getNombre()).isPresent()){
+            throw new RuntimeException("Ya existe una actividad con ese nombre");
+        }
 
-        actividad.setDescripcion(actividadDTO.getDescripcion());
-        actividad.setDuracionMinutos(actividadDTO.getDuracionMinutos());
+        actividadMapper.updateFromRequest(request, actividad);
+        Actividad savedActividad = actividadRepository.save(actividad);
 
-
-        Actividad updatedActividad = actividadRepository.save(actividad);
-        return convertirADTO(updatedActividad);
+        return actividadMapper.toResponseDTO(savedActividad);
     }
 
     /**
      * Eliminar una actividad
      */
-    public void deleteActividad(Integer id) {
+    public void eliminarActividad(Integer id) {
         if (!actividadRepository.existsById(id)) {
             throw new ResourceNotFoundException("Actividad no encontrada con id: " + id);
         }
-        actividadRepository.deleteById(id);
-    }
 
-    /**
-     * Convertir entidad a DTO
-     */
-    private ActividadDTO convertirADTO(Actividad actividad) {
-        return ActividadDTO.builder()
-                .id(actividad.getId())
-                .nombre(actividad.getNombre())
-                .descripcion(actividad.getDescripcion())
-                .duracionMinutos(actividad.getDuracionMinutos())
-                .build();
+        boolean tieneClases = claseRepository.existsByActividadId(id);
+        if (tieneClases) {
+            throw new RuntimeException("No es posible eliminar la actividad porque tiene clases asociadas.");
+        }
+        actividadRepository.deleteById(id);
     }
 }

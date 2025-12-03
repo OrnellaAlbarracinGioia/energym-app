@@ -5,6 +5,7 @@ import com.energym.energym_reservas.dto.response.ActividadResponseDTO;
 import com.energym.energym_reservas.entity.Actividad;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -17,4 +18,7 @@ public interface ActividadMapper {
     ActividadResponseDTO toResponseDTO(Actividad actividad);
 
     List<ActividadResponseDTO> toResponseList(List<Actividad> actividades);
+
+    @Mapping(target = "id", ignore = true)
+    void updateFromRequest(ActividadRequestDTO request, @MappingTarget Actividad actividad);
 }
