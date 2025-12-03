@@ -3,6 +3,7 @@ package com.energym.energym_reservas.service;
 import com.energym.energym_reservas.dto.request.ActividadRequestDTO;
 import com.energym.energym_reservas.dto.response.ActividadResponseDTO;
 import com.energym.energym_reservas.entity.Actividad;
+import com.energym.energym_reservas.exception.BusinessRuleException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.mapper.ActividadMapper;
 import com.energym.energym_reservas.repository.ActividadRepository;
@@ -37,7 +38,7 @@ public class ActividadService {
     @Transactional(readOnly = true)
     public ActividadResponseDTO obtenerActividadPorId(Integer id) {
         Actividad actividad = actividadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad", "id", id));
 
         return actividadMapper.toResponseDTO(actividad);
     }
@@ -48,7 +49,7 @@ public class ActividadService {
     public ActividadResponseDTO crearActividad(ActividadRequestDTO request) {
 
         if(actividadRepository.findByNombreIgnoreCase(request.getNombre()).isPresent()){
-            throw new RuntimeException("Ya existe una actividad con ese nombre");
+            throw new BusinessRuleException("Ya existe una actividad con ese nombre");
         }
 
         Actividad actividad = actividadMapper.toEntity(request);
@@ -61,11 +62,11 @@ public class ActividadService {
      */
     public ActividadResponseDTO actualizarActividad(Integer id, ActividadRequestDTO request) {
         Actividad actividad = actividadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad", "id", id));
 
         if(!actividad.getNombre().equalsIgnoreCase(request.getNombre()) &&
             actividadRepository.findByNombreIgnoreCase(request.getNombre()).isPresent()){
-            throw new RuntimeException("Ya existe una actividad con ese nombre");
+            throw new BusinessRuleException("Ya existe una actividad con ese nombre");
         }
 
         actividadMapper.updateFromRequest(request, actividad);
@@ -79,12 +80,12 @@ public class ActividadService {
      */
     public void eliminarActividad(Integer id) {
         if (!actividadRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Actividad no encontrada con id: " + id);
+            throw new ResourceNotFoundException("Actividad", "id", id);
         }
 
         boolean tieneClases = claseRepository.existsByActividadId(id);
         if (tieneClases) {
-            throw new RuntimeException("No es posible eliminar la actividad porque tiene clases asociadas.");
+            throw new BusinessRuleException("No es posible eliminar la actividad porque tiene clases asociadas.");
         }
         actividadRepository.deleteById(id);
     }
