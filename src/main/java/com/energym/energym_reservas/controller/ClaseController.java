@@ -28,10 +28,25 @@ public class ClaseController {
         return ResponseEntity.ok(clases);
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener la Clase según el ID")
+    public ResponseEntity<ClaseResponseDTO> obtenerClasePorId(@PathVariable("id") Integer id) {
+        ClaseResponseDTO clase = claseService.obtenerClasePorId(id);
+        return ResponseEntity.ok(clase);
+    }
+
     @PostMapping
     @Operation(summary = "Crear clases asociadas a una Actividad", description = "Crea en el sistema clases")
     public ResponseEntity<List<ClaseResponseDTO>> crearClases(@Valid @RequestBody ClasesBatchCreateRequestDTO request) {
         List<ClaseResponseDTO> clasesCreadas = claseService.crearClases(request);
         return ResponseEntity.ok().body(clasesCreadas);
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar la clase")
+    public ResponseEntity<Void> eliminarClase(@PathVariable("id") Integer id) {
+        claseService.eliminarClase(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
