@@ -22,9 +22,6 @@ public class Socio {
     @Column(nullable = false)
     private String nombre;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
     @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro;
 
@@ -45,6 +42,10 @@ public class Socio {
     // Relacion con Reservas
     @OneToMany(mappedBy = "socio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reserva> reservas = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @PrePersist
     protected void onCreate() {

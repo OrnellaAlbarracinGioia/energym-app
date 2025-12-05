@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,12 +49,12 @@ public class SocioController {
         return ResponseEntity.ok(socio);
     }
 
-    @PostMapping
+    /*@PostMapping
     @Operation(summary = "Crear nuevo socio", description = "Registra un nuevo socio en el sistema")
     public ResponseEntity<SocioResponseDTO> crearSocio(@Valid @RequestBody SocioRequestDTO request) {
         SocioResponseDTO nuevoSocio = socioService.crearSocio(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoSocio);
-    }
+    }*/
 
 
     @PutMapping("/{id}")

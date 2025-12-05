@@ -1,7 +1,6 @@
 package com.energym.energym_reservas.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -22,4 +21,8 @@ public class Entrenador {
 
     @Column(nullable = false, unique = true)
     private String contacto;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

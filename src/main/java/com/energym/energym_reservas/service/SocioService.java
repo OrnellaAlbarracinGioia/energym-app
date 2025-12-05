@@ -50,7 +50,8 @@ public class SocioService {
 
     /**
      * Crear un nuevo socio
-     */
+
+
     public SocioResponseDTO crearSocio(SocioRequestDTO request) {
         // Validar que el email no esté registrado
         if (socioRepository.existsByEmail(request.getEmail())) {
@@ -61,7 +62,7 @@ public class SocioService {
         Socio savedSocio = socioRepository.save(socio);
         return socioMapper.toResponseDTO(savedSocio);
 
-    }
+    }*/
 
     /**
      * Actualizar un socio existente
@@ -69,12 +70,6 @@ public class SocioService {
     public SocioResponseDTO actualizarSocio(Integer id, SocioRequestDTO request) {
         Socio socio = socioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Socio", "id", id));
-
-        // Validar email único si cambió
-        if (!socio.getEmail().equals(request.getEmail()) &&
-                socioRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessRuleException("El email ya está registrado: " + request.getEmail());
-        }
 
         socioMapper.updateFromRequest(request, socio);
 
