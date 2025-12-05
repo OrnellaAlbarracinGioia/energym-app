@@ -32,35 +32,17 @@ INSERT INTO socios (nombre, email, telefono, activo, fecha_registro, clases_pers
                                                                                                 ('Carlos Díaz', 'carlos@test.com', '5555555555', true, CURRENT_TIMESTAMP, 0);
 
 -- CLASES
-INSERT INTO clases (actividad_id, entrenador_id, sucursal_id, fecha, horario, capacidad_maxima, es_personalizada) VALUES
-                                                                                                                      (1, 1, 1, '2025-11-03', '09:00:00', 30, false),
-                                                                                                                      (2, 2, 1, '2025-11-03', '10:30:00', 25, false),
-                                                                                                                      (3, 3, 1, '2025-11-04', '18:00:00', 40, false),
-                                                                                                                      (1, 1, 2, '2025-11-05', '09:00:00', 30, false),
-                                                                                                                      (2, 2, 2, '2025-11-05', '17:00:00', 25, false),
-                                                                                                                      (3, 3, 1, '2025-11-06', '19:00:00', 40, false),
-                                                                                                                      (1, 1, 1, '2025-11-07', '10:00:00', 30, false),
-                                                                                                                      (4, 4, 1, '2025-11-10', '15:00:00', 5, true),
-                                                                                                                      (2, 2, 1, '2025-11-10', '09:00:00', 25, false),
-                                                                                                                      (3, 3, 2, '2025-11-11', '18:30:00', 40, false);
+INSERT INTO clases (actividad_id, entrenador_id, sucursal_id, fecha, horario, capacidad_maxima, cupos_ocupados, personalizada) VALUES
+                                                                                                                      (1, 1, 1, '2025-12-03', '09:00:00', 30,0 , false),
+                                                                                                                      (2, 2, 1, '2025-12-03', '10:30:00', 25, 0 ,false),
+                                                                                                                      (3, 3, 1, '2025-12-04', '18:00:00', 40,0 ,false),
+                                                                                                                      (1, 1, 2, '2025-12-05', '09:00:00', 30, 0 ,false),
+                                                                                                                      (2, 2, 2, '2025-12-05', '17:00:00', 25, 0 ,false),
+                                                                                                                      (3, 3, 1, '2025-12-06', '19:00:00', 40, 0 ,false),
+                                                                                                                      (1, 1, 1, '2025-12-07', '10:00:00', 30, 0 ,false),
+                                                                                                                      (4, 4, 1, '2025-12-10', '15:00:00', 5, 0 ,true),
+                                                                                                                      (2, 2, 1, '2025-12-10', '09:00:00', 25, 0 ,false),
+                                                                                                                      (3, 3, 2, '2025-12-11', '18:30:00', 40, 0 ,false);
 
 -- RESERVAS (Socio 1: 10 clases completadas)
-INSERT INTO reservas (socio_id, clase_id, fecha) VALUES
-                                                                                (1, 1, CURRENT_TIMESTAMP),
-                                                                                (1, 2, CURRENT_TIMESTAMP),
-                                                                                (1, 3, CURRENT_TIMESTAMP),
-                                                                                (1, 4, CURRENT_TIMESTAMP),
-                                                                                (1, 5, CURRENT_TIMESTAMP),
-                                                                                (1, 6, CURRENT_TIMESTAMP),
-                                                                                (1, 7, CURRENT_TIMESTAMP),
-                                                                                (1, 1, CURRENT_TIMESTAMP),
-                                                                                (1, 2, CURRENT_TIMESTAMP),
-                                                                                (1, 3, CURRENT_TIMESTAMP),
-                                                                                (2, 4, CURRENT_TIMESTAMP),
-                                                                                (2, 5, CURRENT_TIMESTAMP),
-                                                                                (2, 6, CURRENT_TIMESTAMP),
-                                                                                (2, 7, CURRENT_TIMESTAMP),
-                                                                                (2, 9, CURRENT_TIMESTAMP),
-                                                                                (3, 1, CURRENT_TIMESTAMP),
-                                                                                (3, 3, CURRENT_TIMESTAMP),
-                                                                                (3, 10, CURRENT_TIMESTAMP);
+
