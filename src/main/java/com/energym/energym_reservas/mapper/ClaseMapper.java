@@ -13,6 +13,7 @@ public interface ClaseMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "actividad", ignore = true)
+    @Mapping(target = "cuposOcupados", ignore = true)
     @Mapping(target = "personalizada", ignore = true)
     @Mapping(target = "sucursal", ignore = true)
     @Mapping(target = "entrenador", ignore = true)
@@ -25,7 +26,6 @@ public interface ClaseMapper {
     @Mapping(target = "entrenadorNombre", source = "entrenador.nombre")
     @Mapping(target = "sucursalId", source = "sucursal.id")
     @Mapping(target = "sucursalNombre", source = "sucursal.nombre")
-    @Mapping(target = "cuposDisponibles", ignore = true)
     ClaseResponseDTO toResponseDTO (Clase clase);
 
     List<ClaseResponseDTO> toResponseList (List<Clase> clases);

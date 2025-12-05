@@ -8,6 +8,7 @@ import com.energym.energym_reservas.entity.Reserva;
 import com.energym.energym_reservas.entity.Socio;
 import com.energym.energym_reservas.event.ReservaCompletadaEvent;
 import com.energym.energym_reservas.exception.BusinessRuleException;
+import com.energym.energym_reservas.exception.CapacidadLlenaException;
 import com.energym.energym_reservas.exception.ResourceNotFoundException;
 import com.energym.energym_reservas.mapper.ReservaMapper;
 import com.energym.energym_reservas.repository.ClaseRepository;
@@ -65,15 +66,18 @@ public class ReservaService {
             throw new BusinessRuleException("El socio ya tiene una reserva confirmada en esta clase");
         }
 
-        Integer cuposDisponibles = verificarDisponibilidad(clase.getId());
+        int disponibilidadActualizada = claseRepository.incrementarOcupados(request.getClaseId());
 
-        if(cuposDisponibles <= 0){
-            throw new BusinessRuleException("La clase " + clase.getActividad().getNombre()  + " está llena");
+        if(disponibilidadActualizada == 0) {
+            throw new CapacidadLlenaException("No quedan cupos disponibles para la clase. ");
         }
+
+        Clase claseCompleta = claseRepository.findById(request.getClaseId())
+                .orElseThrow(() -> new ResourceNotFoundException("Clase", "id", request.getClaseId()));
 
         Reserva reserva = Reserva.builder()
                 .socio(socio)
-                .clase(clase)
+                .clase(claseCompleta)
                 .estado(Estado.CONFIRMADA)
                 .build();
 
@@ -205,10 +209,6 @@ public class ReservaService {
     private Integer verificarDisponibilidad(Integer claseId) {
         Clase clase = claseRepository.findById(claseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Clase","id",claseId));
-
-        Integer reservasConfirmadas = reservaRepository.countByClaseIdAndEstado(claseId, Estado.CONFIRMADA);
-        Integer capacidadMaxima = clase.getCapacidadMaxima();
-
-        return capacidadMaxima - reservasConfirmadas;
+        return clase.getCapacidadMaxima() - clase.getCuposOcupados();
     }
 }

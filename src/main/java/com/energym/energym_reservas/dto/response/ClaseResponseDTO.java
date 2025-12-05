@@ -29,7 +29,7 @@ public class ClaseResponseDTO {
 
     private Integer capacidadMaxima;
 
-    private Integer cuposDisponibles;
+    private Integer cuposOcupados;
 
     private Boolean personalizada;
 }

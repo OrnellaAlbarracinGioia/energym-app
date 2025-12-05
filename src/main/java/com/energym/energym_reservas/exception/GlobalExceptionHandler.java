@@ -24,18 +24,15 @@ public class GlobalExceptionHandler {
         return construirRespuesta(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(CapacidadLlenaException.class)
+    public ResponseEntity<ApiErrorDTO> handleCapacidadLlena(CapacidadLlenaException ex, HttpServletRequest request) {
+        return construirRespuesta(HttpStatus.CONFLICT, "Error de Reserva " + ex.getMessage(), request);
+    }
+
     // 404 Not Found
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorDTO> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request){
         return construirRespuesta(HttpStatus.NOT_FOUND, ex.getMessage(), request);
-    }
-
-    //500 Internal Server Error
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorDTO> handleGeneral(Exception ex, HttpServletRequest request) {
-        log.error("Error interno: ", ex);
-        return construirRespuesta(HttpStatus.INTERNAL_SERVER_ERROR,
-    "Ocurrió un error interno inesperado.", request);
     }
 
     //400 Bad Request
@@ -47,12 +44,21 @@ public class GlobalExceptionHandler {
         return construirRespuesta(HttpStatus.BAD_REQUEST, "Error de Validación " + mensajeError, request);
     }
 
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiErrorDTO> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         String nombreParametro = ex.getName();
         String valorRechazado = ex.getValue() != null ? ex.getValue().toString() : "null";
         String mensaje = "El parámetro " + nombreParametro + " tiene un valor incorrecto: " + valorRechazado;
         return construirRespuesta(HttpStatus.BAD_REQUEST, mensaje, request);
+    }
+
+    //500 Internal Server Error
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorDTO> handleGeneral(Exception ex, HttpServletRequest request) {
+        log.error("Error interno: ", ex);
+        return construirRespuesta(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Ocurrió un error interno inesperado.", request);
     }
 
     private ResponseEntity<ApiErrorDTO> construirRespuesta(HttpStatus status, String message, HttpServletRequest request) {

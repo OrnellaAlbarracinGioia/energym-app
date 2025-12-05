@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +45,15 @@ public class Clase {
     @Column(name = "capacidad_maxima", nullable = false)
     private Integer capacidadMaxima;
 
+    @Builder.Default
+    @Column(name = "cupos_ocupados", nullable = false)
+    private Integer cuposOcupados = 0;
+
     @OneToMany(mappedBy = "clase", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reserva> reservas = new ArrayList<>();
 
     @Builder.Default //Permite que Lombok respete el false, porque sino lo ignora
-    @Column(name = "es_personalizada")
+    @Column(name = "personalizada")
     private Boolean personalizada = false;
 
 }
