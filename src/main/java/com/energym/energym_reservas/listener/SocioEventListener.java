@@ -4,8 +4,10 @@ import com.energym.energym_reservas.event.ReservaCompletadaEvent;
 import com.energym.energym_reservas.service.ReservaService;
 import com.energym.energym_reservas.service.SocioService;
 import lombok.AllArgsConstructor;
-import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 
 @Component
@@ -15,13 +17,16 @@ public class SocioEventListener {
     private ReservaService reservaService;
     private SocioService socioService;
 
-    @EventListener
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleReservaCompletada(ReservaCompletadaEvent event) {
 
-        ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(event.getIdReserva());
+        procesarBeneficio(event.getIdReserva());
+    }
 
+    public void procesarBeneficio(Integer idReserva) {
+        ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(idReserva);
         Integer idSocio = reserva.getSocioId();
-
         Integer reservasCompletadasMensual = reservaService.contarClasesCompletadasEnMes(idSocio);
 
         if (reservasCompletadasMensual == 10) {
