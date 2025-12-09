@@ -22,10 +22,11 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Puedes configurar esto en application.properties o usar estos defaults
+    //Por default se creó este Usuario admin
     @Value("${app.admin.email:admin@gym.com}")
     private String adminEmail;
 
+    //Password del Admin
     @Value("${app.admin.password:admin123}")
     private String adminPassword;
 

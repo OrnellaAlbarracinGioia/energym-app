@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200", originPatterns = "*")
 @RestController
 @RequestMapping("/api/reservas")
 @Tag(name = "Reservas", description = "API para reservas del gimnasio")
