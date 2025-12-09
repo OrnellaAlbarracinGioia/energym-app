@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class SucursalController {
     
     private final SucursalService sucursalService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<SucursalResponseDTO> crearSucursal(@Valid @RequestBody SucursalRequestDTO request) {
         SucursalResponseDTO sucursal = sucursalService.crearSucursal(request);
@@ -51,12 +53,14 @@ public class SucursalController {
         return ResponseEntity.ok(sucursales);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<SucursalResponseDTO> actualizarSucursal(@PathVariable("id") Integer id, @Valid @RequestBody SucursalRequestDTO request) {
         SucursalResponseDTO sucursal = sucursalService.actualizarSucursal(id, request);
         return ResponseEntity.ok(sucursal);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSucursal(@PathVariable("id") Integer id) {
         sucursalService.eliminarSucursal(id);

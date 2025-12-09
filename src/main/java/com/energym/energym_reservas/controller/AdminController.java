@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/admin")
@@ -22,6 +24,11 @@ public class AdminController {
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserStaffRequestDTO request) {
         return ResponseEntity.ok().body(userService.registerUserStaff(request));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDTO>> findAllUsers() {
+        return ResponseEntity.ok().body(userService.findAll());
     }
 
 }

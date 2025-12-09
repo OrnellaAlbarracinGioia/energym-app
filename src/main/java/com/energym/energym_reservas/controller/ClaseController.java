@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ public class ClaseController {
         return ResponseEntity.ok(clase);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @Operation(summary = "Crear clases asociadas a una Actividad", description = "Crea en el sistema clases")
     public ResponseEntity<List<ClaseResponseDTO>> crearClases(@Valid @RequestBody ClasesBatchCreateRequestDTO request) {
@@ -42,6 +44,7 @@ public class ClaseController {
         return ResponseEntity.ok().body(clasesCreadas);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar la clase")
     public ResponseEntity<Void> eliminarClase(@PathVariable("id") Integer id) {

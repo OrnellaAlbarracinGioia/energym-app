@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,32 +30,35 @@ public class ReservaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reserva);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<ReservaResponseDTO>> obtenerTodasLasReservas() {
         List<ReservaResponseDTO> reservas = reservaService.obtenerTodasLasReservas();
         return ResponseEntity.ok(reservas);
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'ENTRENADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<ReservaResponseDTO> obtenerReservaPorId(@PathVariable("id") Integer id) {
         ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(id);
         return ResponseEntity.ok(reserva);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'ENTRENADOR')")
     @GetMapping("/socio/{socioId}")
     public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorSocio(@PathVariable("socioId") Integer socioId) {
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorSocio(socioId);
         return ResponseEntity.ok(reservas);
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'ENTRENADOR')")
     @GetMapping("/clase/{claseId}")
     public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorClase(@PathVariable("claseId") Integer claseId) {
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorClase(claseId);
         return ResponseEntity.ok(reservas);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'ENTRENADOR')")
     @GetMapping("/estado/{estado}")
     public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPorEstado(@PathVariable("estado") Estado estado) {
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorEstado(estado);
