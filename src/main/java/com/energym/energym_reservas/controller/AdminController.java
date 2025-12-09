@@ -19,8 +19,8 @@ public class AdminController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserStaffRequestDTO request) {
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserStaffRequestDTO request) {
         return ResponseEntity.ok().body(userService.registerUserStaff(request));
     }
 

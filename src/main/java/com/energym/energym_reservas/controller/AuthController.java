@@ -18,8 +18,13 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserPublicRequestDTO request){
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserPublicRequestDTO request){
         return ResponseEntity.ok().body(userService.registerUserPublic(request));
     }
 
+    /*@PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO dto) {
+        //TODO
+        return ResponseEntity.ok("Login pendiente de implementación");
+    }*/
 }
