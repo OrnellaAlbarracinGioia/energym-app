@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -51,6 +52,12 @@ public class GlobalExceptionHandler {
         String valorRechazado = ex.getValue() != null ? ex.getValue().toString() : "null";
         String mensaje = "El parámetro " + nombreParametro + " tiene un valor incorrecto: " + valorRechazado;
         return construirRespuesta(HttpStatus.BAD_REQUEST, mensaje, request);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorDTO> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
+        String mensaje = "No tienes permisos suficientes para acceder a este recurso.";
+        return construirRespuesta(HttpStatus.FORBIDDEN, mensaje, request);
     }
 
     //500 Internal Server Error
