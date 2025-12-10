@@ -49,22 +49,6 @@ public class SocioService {
     }
 
     /**
-     * Crear un nuevo socio
-
-
-    public SocioResponseDTO crearSocio(SocioRequestDTO request) {
-        // Validar que el email no esté registrado
-        if (socioRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessRuleException("El email ya está registrado: " + request.getEmail());
-        }
-
-        Socio socio = socioMapper.toEntity(request);
-        Socio savedSocio = socioRepository.save(socio);
-        return socioMapper.toResponseDTO(savedSocio);
-
-    }*/
-
-    /**
      * Actualizar un socio existente
      */
     public SocioResponseDTO actualizarSocio(Integer id, SocioRequestDTO request) {
@@ -86,6 +70,7 @@ public class SocioService {
 
         //Marcar como inactivo en lugar de eliminar físicamente
         socio.setActivo(false);
+        socioRepository.save(socio);
     }
 
     /**
@@ -105,7 +90,7 @@ public class SocioService {
     }
 
     /**
-     * Adicionar una clase personalizda según corresponda
+     * Adicionar una clase personalizada según corresponda
      */
     public void beneficioClasePersonalizadaGratuita(Integer id) {
         Socio socio = socioRepository.findById(id)
@@ -113,6 +98,8 @@ public class SocioService {
 
         Integer clasesActualizadas = socio.getClasesPersonalizadas() + 1;
         socio.setClasesPersonalizadas(clasesActualizadas);
+
+        socioRepository.save(socio);
     }
 
     /**
