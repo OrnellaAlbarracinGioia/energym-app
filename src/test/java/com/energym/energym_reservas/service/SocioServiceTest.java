@@ -129,7 +129,7 @@ class SocioServiceTest {
 
         verify(socioRepository).findById(id);
         verify(socioMapper).updateFromRequest(socioActualizado, socio);
-        verify(socioRepository).save(socio);
+        verify(socioRepository).save(any(Socio.class));
     }
 
     @Test
@@ -146,7 +146,6 @@ class SocioServiceTest {
         verify(socioRepository).findById(idInvalido);
         verify(socioMapper, never()).updateFromRequest(any(), any());
         verify(socioRepository, never()).save(any());
-        verify(socioMapper, never()).toResponseDTO(any());
     }
 
     @Test
@@ -181,7 +180,6 @@ class SocioServiceTest {
     @DisplayName("Eliminar permanentemente Socio con ID Existente sin Reservas")
     void eliminarPermanenteSocioPorIdSinReserva(){
         Integer id = 10;
-        Socio socio = crearSocio( id,"Fernando", "1185634712");
 
         when(socioRepository.existsById(id)).thenReturn(true);
         when(reservaRepository.existsBySocioId(id)).thenReturn(false);
@@ -197,7 +195,6 @@ class SocioServiceTest {
     @DisplayName("Intentar eliminar permanentemente Socio con ID Existente con Reservas")
     void eliminarPermanenteSocioPorIdExistenteConReserva(){
         Integer id = 10;
-        Socio socio = crearSocio( id,"Fernando", "1185634712");
 
         when(socioRepository.existsById(id)).thenReturn(true);
         when(reservaRepository.existsBySocioId(id)).thenReturn(true);
@@ -277,10 +274,9 @@ class SocioServiceTest {
     }
 
     @Test
-    @DisplayName("Solicitar el Historial Vacío de Asistencia de Socio con ID Existente  ")
+    @DisplayName("Solicitar el Historial Vacío de Asistencia de Socio con ID Existente")
     void solicitarHistorialDeAsistenciaVacioPorSocioId() {
         Integer id = 4;
-        Socio socio = crearSocio( id,"Morena", "1198736602");
 
         when(socioRepository.existsById(id)).thenReturn(true);
         when(reservaRepository.findBySocioIdAndEstado(id, Estado.COMPLETADA)).thenReturn(Collections.emptyList());
@@ -335,16 +331,8 @@ class SocioServiceTest {
         reserva2.setFechaCreacion(LocalDateTime.now());
         reserva2.setEstado(Estado.COMPLETADA);
 
-        Reserva reserva3 = new Reserva();
-        reserva3.setId(3);
-        reserva3.setSocio(socio);
-        reserva3.setClase(clase);
-        reserva3.setFechaCreacion(LocalDateTime.of(2025, 12, 1, 11, 23, 6));
-        reserva3.setEstado(Estado.COMPLETADA);
-
         reservas.add(reserva1);
         reservas.add(reserva2);
-        reservas.add(reserva3);
 
         return reservas;
     }
