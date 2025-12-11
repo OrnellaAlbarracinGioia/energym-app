@@ -102,7 +102,7 @@ class SocioServiceTest {
     @DisplayName("Obtener socio por ID (No existe)")
     void obtenerSocioPorIdInexistente() {
         Integer id = 99;
-        when(socioRepository.findById(id)).thenThrow(ResourceNotFoundException.class);
+        when(socioRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> socioService.obtenerSocioPorId(id), "Si un ID no existe en la BD se debería arrojar la Exception");
 
         verify(socioRepository).findById(id);
@@ -137,7 +137,7 @@ class SocioServiceTest {
     void noActualizarSocioInexistente() {
         Integer idInvalido = 99;
 
-        when(socioRepository.findById(idInvalido)).thenThrow(ResourceNotFoundException.class);
+        when(socioRepository.findById(idInvalido)).thenReturn(Optional.empty());
 
         SocioRequestDTO socioActualizado = new SocioRequestDTO("Miguel", "1122334444");
 
@@ -170,7 +170,7 @@ class SocioServiceTest {
     @DisplayName("Intentar eliminar (Desactivar) Socio con ID Inexistente")
     void eliminarSocioPorIdInexistente(){
         Integer id = 99;
-        when(socioRepository.findById(id)).thenThrow(ResourceNotFoundException.class);
+        when(socioRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> socioService.eliminarSocio(id));
 
         verify(socioRepository).findById(id);
@@ -246,7 +246,7 @@ class SocioServiceTest {
     @DisplayName("Adicionar Clase Personalizada a Socio con ID Inexistente")
     void aplicarPersonalizadaGratuitaASocioInexistente() {
         Integer id = 4;
-        when(socioRepository.findById(id)).thenThrow(ResourceNotFoundException.class);
+        when(socioRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> socioService.beneficioClasePersonalizadaGratuita(id));
 
@@ -274,6 +274,25 @@ class SocioServiceTest {
         verify(socioRepository).existsById(id);
         verify(reservaRepository).findBySocioIdAndEstado(id, Estado.COMPLETADA);
         verify(reservaMapper).toResponseList(reservas);
+    }
+
+    @Test
+    @DisplayName("Solicitar el Historial Vacío de Asistencia de Socio con ID Existente  ")
+    void solicitarHistorialDeAsistenciaVacioPorSocioId() {
+        Integer id = 4;
+        Socio socio = crearSocio( id,"Morena", "1198736602");
+
+        when(socioRepository.existsById(id)).thenReturn(true);
+        when(reservaRepository.findBySocioIdAndEstado(id, Estado.COMPLETADA)).thenReturn(Collections.emptyList());
+
+        List<ReservaResponseDTO>  resultado = socioService.obtenerHistorialAsistencia(id);
+
+        assertNotNull(resultado, "El resultado no deberías ser nulo");
+        assertTrue(resultado.isEmpty(), "La lista de Reservas debería ser vacía");
+
+        verify(socioRepository).existsById(id);
+        verify(reservaRepository).findBySocioIdAndEstado(id, Estado.COMPLETADA);
+        verify(reservaMapper).toResponseList(Collections.emptyList());
     }
 
     @Test
