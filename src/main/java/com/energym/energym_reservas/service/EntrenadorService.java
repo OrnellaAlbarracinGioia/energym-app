@@ -22,19 +22,6 @@ public class EntrenadorService {
     private final EntrenadorRepository entrenadorRepository;
     private final EntrenadorMapper entrenadorMapper;
     private final ClaseRepository claseRepository;
-
-    /**
-     * Crear un nuevo entrenador
-    public EntrenadorResponseDTO crearEntrenador(EntrenadorRequestDTO request) {
-        // Validar que no exista un entrenador con el mismo contacto
-        if (entrenadorRepository.findByContacto(request.getContacto()).isPresent()) {
-            throw new BusinessRuleException("Ya existe un entrenador con ese contacto");
-        }
-        
-        Entrenador entrenador = entrenadorMapper.toEntity(request);
-        Entrenador savedEntrenador =  entrenadorRepository.save(entrenador);
-        return entrenadorMapper.toResponseDTO(savedEntrenador);
-    }*/
     
     /*
      * Obtener todos los entrenadores

@@ -115,7 +115,7 @@ class SucursalServiceTest {
 
     @Test
     @DisplayName("Obtener Sucursal por ID (OK)")
-    void obtenerSucursalPorID(){
+    void obtenerSucursalPorId(){
 
         Integer id = 1;
         Sucursal sucursal = crearSucursal(id, "Central Energym", "Av. Corrientes 123");
@@ -134,7 +134,7 @@ class SucursalServiceTest {
 
     @Test
     @DisplayName("Obtener Sucursal por ID (NO encuentra)")
-    void obtenerSucursalPorIDInexistente(){
+    void obtenerSucursalPorIdInexistente(){
         Integer id = 99;
 
         when(sucursalRepository.findById(id)).thenReturn(Optional.empty());
