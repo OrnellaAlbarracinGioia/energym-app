@@ -1,5 +1,6 @@
 package com.energym.energym_reservas.entity;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,7 +8,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReservaTest {
 
     @Test
-    void onCreate_asignarEstadoConfirmada_siNulo() {
+    @DisplayName("Reserva con Estado nulo se le asigna Estado por OnCreate")
+    void onCreateAsignarEstadoConfirmadaSiNulo() {
         Reserva reserva = new Reserva();
         reserva.setEstado(null);
         reserva.onCreate();
@@ -17,7 +19,8 @@ class ReservaTest {
     }
 
     @Test
-    void onCreate_estadoExistente_noModificar() {
+    @DisplayName("Reserva con Estado existente no es modificado por OnCreate")
+    void onCreateEstadoExistenteNoModificar() {
         Reserva reserva = new Reserva();
         reserva.setEstado(Estado.CANCELADA);
         reserva.onCreate();

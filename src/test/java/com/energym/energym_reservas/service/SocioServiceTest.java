@@ -47,7 +47,7 @@ class SocioServiceTest {
     SocioService socioService;
 
     @Test
-    @DisplayName("Obtener todos los Socios (Existentes)")
+    @DisplayName("Obtener todos los Socios (OK)")
     void obtenerTodosLosSocios() {
         Socio socio1 = crearSocio(1,"Miguel", "1122334455");
         Socio socio2 = crearSocio(2, "Florencia", "1122334466");
@@ -81,7 +81,7 @@ class SocioServiceTest {
     }
 
     @Test
-    @DisplayName("Obtener Socio por ID (Existente)")
+    @DisplayName("Obtener Socio por ID (OK)")
     void obtenerSocioPorId() {
         Socio socio = crearSocio(3,"Ramon", "1188997766");
 
@@ -99,7 +99,7 @@ class SocioServiceTest {
     }
 
     @Test
-    @DisplayName("Obtener socio por ID (No existe)")
+    @DisplayName("Obtener socio por ID (NO encuentra)")
     void obtenerSocioPorIdInexistente() {
         Integer id = 99;
         when(socioRepository.findById(id)).thenReturn(Optional.empty());
@@ -110,7 +110,7 @@ class SocioServiceTest {
     }
 
     @Test
-    @DisplayName("Actualizar Socio correctamente")
+    @DisplayName("Actualizar Socio existente (OK))")
     void actualizarSocio() {
         Integer id = 1;
         Socio socio = crearSocio( id,"Miguel", "1122334455");
@@ -133,7 +133,7 @@ class SocioServiceTest {
     }
 
     @Test
-    @DisplayName("No actualizar Socio inexistente")
+    @DisplayName("Actualizar Socio inexistente (FALLA)")
     void noActualizarSocioInexistente() {
         Integer idInvalido = 99;
 

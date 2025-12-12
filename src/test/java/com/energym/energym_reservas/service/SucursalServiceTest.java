@@ -108,8 +108,8 @@ class SucursalServiceTest {
 
         List<SucursalResponseDTO> resultado = sucursalService.obtenerTodasLasSucursales();
 
-        assertNotNull(resultado, "La lista nunca debe ser NULL");
-        assertTrue(resultado.isEmpty(), "La lista debe estar vacía");
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
         verify(sucursalRepository).findAll();
     }
 
@@ -117,19 +117,19 @@ class SucursalServiceTest {
     @DisplayName("Obtener Sucursal por ID (OK)")
     void obtenerSucursalPorID(){
 
-        Integer idSucursal = 1;
-        Sucursal sucursal = crearSucursal(idSucursal, "Central Energym", "Av. Corrientes 123");
+        Integer id = 1;
+        Sucursal sucursal = crearSucursal(id, "Central Energym", "Av. Corrientes 123");
 
-        when(sucursalRepository.findById(idSucursal)).thenReturn(Optional.of(sucursal));
+        when(sucursalRepository.findById(id)).thenReturn(Optional.of(sucursal));
 
-        SucursalResponseDTO resultado = sucursalService.obtenerSucursalPorId(idSucursal);
+        SucursalResponseDTO resultado = sucursalService.obtenerSucursalPorId(id);
 
         assertNotNull(resultado);
         assertEquals(sucursal.getId(), resultado.getId());
         assertEquals(sucursal.getNombre(),resultado.getNombre());
         assertEquals(sucursal.getDireccion(),resultado.getDireccion());
 
-        verify(sucursalRepository).findById(idSucursal);
+        verify(sucursalRepository).findById(id);
     }
 
     @Test
@@ -230,10 +230,10 @@ class SucursalServiceTest {
 
         SucursalResponseDTO resultado = sucursalService.actualizarSucursal(id, sucursalActualizada);
 
-        assertNotNull(resultado, "El resultado no debería ser nulo");
-        assertEquals(sucursal.getId(), resultado.getId(), "El ID no debería haberse modificado");
-        assertNotEquals(nombreAnterior, resultado.getNombre(), "El nombre de la sucursal se debería hacer actualizado");
-        assertNotEquals(direccionAnterior, resultado.getDireccion(), "La dirección de la sucursal deberia haberse modificado");
+        assertNotNull(resultado);
+        assertEquals(sucursal.getId(), resultado.getId());
+        assertNotEquals(nombreAnterior, resultado.getNombre());
+        assertNotEquals(direccionAnterior, resultado.getDireccion());
 
         verify(sucursalRepository).findById(id);
         verify(sucursalRepository).findByNombreIgnoreCase(sucursalActualizada.getNombre());
@@ -256,7 +256,7 @@ class SucursalServiceTest {
 
         SucursalResponseDTO resultado = sucursalService.actualizarSucursal(id, sucursalActualizada);
 
-        assertNotNull(resultado, "El resultado no debería ser nulo");
+        assertNotNull(resultado);
         assertEquals(sucursal1.getId(), resultado.getId());
         assertEquals(sucursal1.getNombre(), resultado.getNombre());
         assertEquals(sucursal1.getDireccion(), resultado.getDireccion());
@@ -324,7 +324,9 @@ class SucursalServiceTest {
     @DisplayName("Eliminar Sucursal según ID Inexistente (FALLA)")
     void eliminarSucursalConIdInexistente(){
         Integer idInvalido = 99;
+
         when(sucursalRepository.existsById(idInvalido)).thenReturn(false);
+
         assertThrows(ResourceNotFoundException.class, () -> sucursalService.eliminarSucursal(idInvalido));
 
         verify(sucursalRepository).existsById(idInvalido);
