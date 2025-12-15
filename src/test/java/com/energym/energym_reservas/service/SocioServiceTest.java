@@ -321,7 +321,7 @@ class SocioServiceTest {
         reserva1.setId(1);
         reserva1.setSocio(socio);
         reserva1.setClase(clase);
-        reserva1.setFechaCreacion(LocalDateTime.of(2025, 12, 9, 10, 15, 0));
+        reserva1.setFechaCreacion(LocalDateTime.now().minusDays(1));
         reserva1.setEstado(Estado.COMPLETADA);
 
         Reserva reserva2 = new Reserva();
