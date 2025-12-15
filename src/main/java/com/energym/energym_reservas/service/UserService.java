@@ -127,9 +127,13 @@ public class UserService implements UserDetailsService {
 
     private void createProfileEntrenador(User savedUser, UserStaffRequestDTO request) {
 
+        if(entrenadorRepository.existsByContacto(request.getTelefono())){
+            throw new BusinessRuleException("Ya existe un entrenador con ese contacto");
+        }
+
         Entrenador nuevo = Entrenador.builder()
                 .nombre(request.getName())
-                .contacto(request.getEmail())
+                .contacto(request.getTelefono())
                 .user(savedUser)
                 .build();
         entrenadorRepository.save(nuevo);

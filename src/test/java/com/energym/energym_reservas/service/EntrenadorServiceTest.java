@@ -165,7 +165,7 @@ class EntrenadorServiceTest {
 
     @Test
     @DisplayName("Actualizar entrenador manteniendo el mismo Contacto (NO busca duplicados)")
-    void actualizarEntrenadorExistenteMismoNombre(){
+    void actualizarEntrenadorExistenteMismoContacto(){
         Entrenador entrenador = crearEntrenador(1,"Julian", "1155662233");
         String nombreAnterior = entrenador.getNombre();
 

@@ -26,4 +26,7 @@ public class UserStaffRequestDTO {
 
     @NotBlank(message = "El campo de nombre es requerido")
     private String name;
+
+    @NotBlank(message = "El teléfono es obligatorio")
+    private String telefono;
 }

@@ -13,4 +13,6 @@ public interface EntrenadorRepository extends JpaRepository<Entrenador, Integer>
     List<Entrenador> findByNombreContainingIgnoreCase(String nombre);
 
     Optional<Entrenador> findByContacto(String contacto);
+
+    boolean existsByContacto(String contacto);
 }
