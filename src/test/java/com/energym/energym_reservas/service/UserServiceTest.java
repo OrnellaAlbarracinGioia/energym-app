@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 
@@ -36,6 +37,9 @@ class UserServiceTest {
 
     @Mock
     RoleRepository roleRepository;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Mock
     SocioRepository socioRepository;
