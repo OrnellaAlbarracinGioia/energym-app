@@ -62,7 +62,7 @@ class ClaseServiceTest {
 
         List<ClaseScheduleRequestDTO> datosClases = Arrays.asList(
                 crearDatosClase(idEntrenador1, 10, LocalDate.now(), LocalTime.now()),
-                crearDatosClase(idEntrenador2, 20, LocalDate.of(2025,12,26), LocalTime.of(9,30))
+                crearDatosClase(idEntrenador2, 20, LocalDate.now().plusDays(1), LocalTime.of(9,30))
         );
 
         ClasesBatchCreateRequestDTO request = crearClasesRequestDTO(actividad.getId(), sucursal.getId(), datosClases);

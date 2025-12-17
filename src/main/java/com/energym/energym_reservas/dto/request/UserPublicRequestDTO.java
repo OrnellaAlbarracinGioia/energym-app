@@ -13,13 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserPublicRequestDTO {
 
-    @Email
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El email debe ser válido")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "La contraseña no puede estar vacía")
     private String password;
 
-    @NotBlank(message = "El nombre es obligatorio")
+    @NotBlank(message = "El campo de nombre es requerido")
     private String nombre;
 
     @NotBlank(message = "El teléfono es obligatorio")

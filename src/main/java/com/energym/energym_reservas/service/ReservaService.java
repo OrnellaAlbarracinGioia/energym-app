@@ -205,10 +205,4 @@ public class ReservaService {
 
         return clasesCompletadas != null ? clasesCompletadas : 0;
     }
-
-    private Integer verificarDisponibilidad(Integer claseId) {
-        Clase clase = claseRepository.findById(claseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Clase","id",claseId));
-        return clase.getCapacidadMaxima() - clase.getCuposOcupados();
-    }
 }
